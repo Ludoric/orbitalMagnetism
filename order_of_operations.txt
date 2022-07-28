@@ -1,0 +1,38 @@
+The first step was to do some reading on how exactly this was meant to work. I'm not completely happy with how much of that I did, but I can always come back to it.
+
+Compile QE
+Convergence testing
+
+The software used to perform the dft calculations was QUANTUM ESPRESSO, and thus compiling it Rāpoi, VUW's High Performance Compute Cluster is necessary. Unfortunately doing this efficiently is harder than one might think, and so in the end this task was completed by Andre Geldenhuis, the custodian of the computer.
+
+Several parameters can strongly effect the time it takes to run `?dft?, and whether or not the result actually convergence on a meaningful value. The most important of the parameters are:
+ecutwfc
+ecutrho
+and the number of k points
+
+If these numbers are set to the wrong value laksdj;flkajsd;
+
+We can see if convergence has occurred successfully by examining output parameters such as  
+
+
+
+
+
+
+And now for band structure calculations.
+First the structure is allowed to relax (by running the same script as before, just specifying calculation='relax'.
+
+Then we run with calculation='bands'. Importantly, this time the we must specify a different set of k points to run the calculation on. 
+I have written a (only slightly janky) python script to generate this (see bandplot_kpoints.py). My only resources when writing this script were half-remembered things that will had said over a week ago, the docs for pw.x, and the website http://lampx.tugraz.at/~hadley/ss1/bzones/fcc.php, which translated the labels for the points into their coordinates.
+
+
+
+Gamma-X: 2*pi/a
+Gamma-L: sqrt(3)*pi/a
+Gamma-W: sqrt(5)*pi/a
+Gamma-K: 3/sqrt(2)*pi/a
+Gamma-U: 3/sqrt(2)*pi/a
+K-W:     1/sqrt(2)*pi/a
+X-U:     1/sqrt(2)*pi/a
+
+
