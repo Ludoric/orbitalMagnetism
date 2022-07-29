@@ -35,12 +35,10 @@
   electron_maxstep = 80
   mixing_beta =   4.0000000000d-01
 /
-&IONS
-/
 ATOMIC_SPECIES
 Gd     157.25 Gd.GGA-PBE-paw-v1.0.UPF
 N      14.0067 N.oncvpsp.upf
-ATOMIC_POSITIONS crystal
-Gd           0.0000000000       0.0000000000       0.0000000000 
-N            0.5000000000       0.5000000000       0.5000000000 
-! kpoints appended separately
+ATOMIC_POSITIONS (crystal)
+Gd           0.0000000000       0.0000000000       0.0000000000
+N            0.5000000000       0.5000000000       0.5000000000
+! kpoints and hubbard appended separately

@@ -22,7 +22,7 @@ SCRATCH="/nfs/scratch2/trewicedwa/GdN_relax_band"
 
 PWTEMPLATE="${SRC}/templates/BS2_GdN-FCC.in"
 BANDSTEMPLATE="${SRC}/templates/BS_bands.in"
-R_TITLE="bands2_GdN-FCC"
+R_TITLE='bands2_GdN-FCC'
 
 PREFIX='relax_GdN-FCC'
 ECUTRHO=320
@@ -48,11 +48,10 @@ mpirun -np 64 pw.x -npool 4 -in $PWIOPUT'.in' > $PWIOPUT'.out'
 for SPIN in 1 2
 do
     BANDSIOPUT="${SCRATCH}/${R_TITLE}-S${SPIN}.bands"
-    
+
     sed -e "s/%prefix%/$PREFIX/g; s+%outdir%+$SCRATCH/out/+g;" \
         -e "s+%filband%+${BANDSIOPUT}+g; s/%spin_component%/$SPIN/g;" \
         $BANDSTEMPLATE > $BANDSIOPUT'.in'
 
     bands.x < $BANDSIOPUT'.in' > $BANDSIOPUT'.out'
 done
-

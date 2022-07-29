@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import bandplot_kpoints as kp
 
+
 def readBandFile(fname):
     nbnd = nks = 0
     dat = []
@@ -20,6 +21,7 @@ def readBandFile(fname):
             dat.append(np.array(values, float))
     return np.array(dat)  # , nks, nbnd
 
+
 def plotData(datup, datdown=None):
     f = plt.figure()
     ax = f.add_subplot()
@@ -35,7 +37,7 @@ def plotData(datup, datdown=None):
         ax.plot(horiz, datup[:, i], '-r', label='Majority Spin (↑)')  # '.k'
     kpoints_x = []
     kpoints_n = []
-    for h, l in zip(horiz, datup[:,:3]):
+    for h, l in zip(horiz, datup[:, :3]):
         if kpoint := kp.nameFromKvec(l):
             kpoints_x.append(h)
             kpoints_n.append('Γ' if kpoint == 'Gamma' else kpoint)
@@ -53,9 +55,10 @@ def plotData(datup, datdown=None):
         ax.legend(by_label.values(), by_label.keys())
     return f, ax
 
+
 if __name__ == '__main__':
     # dat = readBandFile('bands_out_GdN-FCC.bands')
-    dup = readBandFile('bands-up_GdN-FCC.bands')
-    ddown = readBandFile('bands-down_GdN-FCC.bands')
+    dup = readBandFile('bands2_GdN-FCC-S1.bands')
+    ddown = readBandFile('bands2_GdN-FCC-S2.bands')
     f, ax = plotData(dup, ddown)
     plt.show()
