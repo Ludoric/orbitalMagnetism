@@ -22,7 +22,7 @@ SCRATCH="/nfs/scratch2/trewicedwa/GdN_relax_band"
 
 PWTEMPLATE="${SRC}/templates/BS2_GdN-FCC.in"
 BANDSTEMPLATE="${SRC}/templates/BS_bands.in"
-R_TITLE="bands_GdN-FCC"
+R_TITLE="bands2_GdN-FCC"
 
 PREFIX='relax_GdN-FCC'
 ECUTRHO=320
@@ -40,7 +40,7 @@ sed -e "s/%title%/$R_TITLE/g; s+%outdir%+${SCRATCH}/out/+g;" \
     -e "s/%nbnd%/${NBND}/g; s/%calculation%/${CALCULATION}/g;" \
     $PWTEMPLATE > $PWIOPUT'.in'
 
-cat "${SRC}/py_scripts/kpoints.txt" >> $PWIOPUT'.in'
+cat "${SRC}/py_scripts/kpoints2.txt" >> $PWIOPUT'.in'
 
 mpirun -np 64 pw.x -npool 4 -in $PWIOPUT'.in' > $PWIOPUT'.out'
 

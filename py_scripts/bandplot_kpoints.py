@@ -79,7 +79,9 @@ if __name__ == '__main__':
         print('First argument must be an integer')
         exit()
     if len(sys.argv)==2:
-        route = ['Gamma', 'X', 'W', 'L', 'Gamma', 'U', 'X', 'W']
+        route = ['Gamma', 'X', 'W', 'K', 'Gamma', 'L', 'K', 'W', 'L', 'U', 'X', 'U', 'W']
+        # route = ['Gamma', 'X', 'W', 'K', 'Gamma', 'L', 'U', 'W', 'L', 'K']  # ['U', 'X']
+        # route = ['Gamma', 'X', 'W', 'L', 'Gamma', 'U', 'X', 'W']
     elif len(sys.argv)==3:
         print(f'Please supply two or more labels from {set(NAME_TO_CRYSTAL_KVEC)}')
         exit()
