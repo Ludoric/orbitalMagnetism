@@ -1,0 +1,16 @@
+#!/bin/bash
+#SBATCH --job-name=GdN-FCC_sfc_qe71
+#SBATCH --time=00-00:10:00
+#SBATCH --output=/nfs/home/trewicedwa/logs/GdN-FCC_sfc_qe71.out
+#SBATCH --error=/nfs/home/trewicedwa/logs/GdN-FCC_sfc_qe71.err
+#SBATCH --partition=parallel
+#SBATCH --ntasks=64
+#SBATCH --cpus-per-task=1
+#SBATCH --tasks-per-node=32
+#SBATCH --mem-per-cpu=1G
+#SBATCH --nodes=2
+#SBATCH --constraint="AMD"
+
+module load intel/2022.00
+
+mpirun -np 64 /nfs/home/trewicedwa/qe-7.1/bin/pw.x -npool 4 -in /nfs/home/trewicedwa/qe/GdN-FCC_sfc.in > /nfs/home/trewicedwa/qe/GdN-FCC_sfc.out

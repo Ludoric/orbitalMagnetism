@@ -1,0 +1,46 @@
+&CONTROL
+  calculation = 'scf'
+  title = 'GdN_FCC-scf'
+  verbosity = 'high'
+  restart_mode = 'from_scratch'
+  nstep = 1
+  etot_conv_thr =   8.0000000000d-05
+  forc_conv_thr =   1.0000000000d-04
+  outdir = '/nfs/home/trewicedwa/qe/out/'
+  prefix = 'GdN_FCC-scf'
+  pseudo_dir = '/nfs/home/trewicedwa/qe/pseudo/'
+  disk_io = 'low'
+  tprnfor = .true.
+  tstress = .true.
+
+/
+&SYSTEM
+  degauss =   1.4699723600d-02
+  ecutrho =   3.2000000000d+02
+  ecutwfc =   8.0000000000d+01
+  ibrav = 2
+  A = 4.999, B = 4.999, C = 4.999, cosAB = 0, cosAC = 0, cosBC = 0
+  nat = 2
+  nosym = .false.
+  nspin = 2
+  ntyp = 2
+  occupations = 'smearing'
+  smearing = 'cold'
+  starting_magnetization(1) =   2.7777777778d-01
+  starting_magnetization(2) =   1.0000000000d-01
+/
+&ELECTRONS
+  conv_thr =   1.6000000000d-09
+  electron_maxstep = 80
+  mixing_beta =   4.0000000000d-01
+/
+&IONS
+/
+ATOMIC_SPECIES
+Gd     157.25 Gd.GGA-PBE-paw-v1.0.UPF
+N      14.0067 N.oncvpsp.upf
+ATOMIC_POSITIONS crystal
+Gd           0.0000000000       0.0000000000       0.0000000000 
+N            0.5000000000       0.5000000000       0.5000000000 
+K_POINTS automatic
+7 7 7 0 0 0

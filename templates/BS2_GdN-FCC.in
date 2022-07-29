@@ -1,0 +1,46 @@
+&CONTROL
+  calculation = '%calculation%'
+  title = '%title%'
+  verbosity = 'high'
+  restart_mode = 'from_scratch'
+  nstep = 1
+  etot_conv_thr =   8.0000000000d-05
+  forc_conv_thr =   1.0000000000d-04
+  outdir = '%outdir%'
+  prefix = '%prefix%'
+  pseudo_dir = '%pseudo_dir%'
+  disk_io = 'low'
+  tprnfor = .true.
+  tstress = .true.
+
+/
+&SYSTEM
+  degauss =   1.4699723600d-02
+  ecutrho =   %ecutrho%
+  ecutwfc =   %ecutwfc%
+  ibrav = 2
+  A = 4.999
+  nat = 2
+  nosym = .false.
+  nspin = 2
+  ntyp = 2
+  nbnd = %nbnd% ! num Kohn-Sham states; 16 by default, 25(ish?) for calculation=band
+  occupations = 'smearing'
+  smearing = 'gauss'
+  starting_magnetization(1) =   1.0
+  starting_magnetization(2) =   0.0
+/
+&ELECTRONS
+  conv_thr =   1.6000000000d-09
+  electron_maxstep = 80
+  mixing_beta =   4.0000000000d-01
+/
+&IONS
+/
+ATOMIC_SPECIES
+Gd     157.25 Gd.GGA-PBE-paw-v1.0.UPF
+N      14.0067 N.oncvpsp.upf
+ATOMIC_POSITIONS crystal
+Gd           0.0000000000       0.0000000000       0.0000000000 
+N            0.5000000000       0.5000000000       0.5000000000 
+! kpoints appended separately

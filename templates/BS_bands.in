@@ -1,0 +1,7 @@
+&BANDS
+ outdir='%outdir%',
+ prefix='%prefix%',
+ filband='%filband%',
+ spin_component=%spin_component%,
+/
+
