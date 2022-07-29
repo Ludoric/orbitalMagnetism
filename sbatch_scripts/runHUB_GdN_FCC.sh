@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=relax+U_GdN-FCC
-#SBATCH --time=00-12:00:00
+#SBATCH --time=00-23:00:00
 #SBATCH --output=/nfs/scratch2/trewicedwa/GdN_hubbard/logs/hubbard1.out
 #SBATCH --error=/nfs/scratch2/trewicedwa/GdN_hubbard/logs/hubbard1.err
 #SBATCH --partition=parallel
@@ -23,7 +23,7 @@ PWTEMPLATE="${SRC}/templates/BS2_GdN-FCC.in"
 BANDSTEMPLATE="${SRC}/templates/BS_bands.in"
 
 PREFIX='hubbard'
-HUBBARD="HUBBARD  (ortho-atomic)\nU Gd-4f "
+HUBBARD="HUBBARD (ortho-atomic)\nU Gd-4f "
 ECUTRHO=320
 ECUTWFC=80
 
@@ -36,7 +36,7 @@ B_CALCULATION='bands'
 B_NBND=25
 B_K_FILE="${SRC}/templates/kpoints.txt" # actually, are you sure about that????
 
-for HU_GD_4F in $(seq -1.0 0.5 12.0)
+for HU_GD_4F in $(seq -1.0 0.25 15.0)
 do
     echo -e "Gd-4f: ${HU_GD_4F}" # NEW CALCULATION
     TITLE="H_Gd4f_${HU_GD_4F}_GdN-FCC"
@@ -50,7 +50,7 @@ do
         $PWTEMPLATE > $RPWIOPUT'.in'
 
     sed -e "s/%k%/${R_K}/g" $R_K_FILE >> $RPWIOPUT'.in'
-    echo -e "${HUBBARD}${HU_GD_4F}" >>$RPWIOPUT'.in'
+    echo -e "${HUBBARD}${HU_GD_4F}\n" >> $RPWIOPUT'.in'
 
     mpirun -np 64 pw.x -npool 4 -in $RPWIOPUT'.in' > $RPWIOPUT'.out'
 
@@ -64,7 +64,7 @@ do
         $PWTEMPLATE > $BPWIOPUT'.in'
 
     cat $B_K_FILE >> $BPWIOPUT'.in'
-    echo -e "${HUBBARD}${HU_GD_4F}" >>$BPWIOPUT'.in'
+    echo -e "${HUBBARD}${HU_GD_4F}\n" >> $BPWIOPUT'.in'
 
     mpirun -np 64 pw.x -npool 4 -in $BPWIOPUT'.in' > $BPWIOPUT'.out'
 
@@ -78,6 +78,8 @@ do
             -e "s+%filband%+${BANDSIOPUT}+g; s/%spin_component%/$SPIN/g;" \
             $BANDSTEMPLATE > $BANDSIOPUT'.in'
 
+        # mpirun -np 64 bands.x -npoop 4 -in  $BANDSIOPUT'.in' > $BANDSIOPUT'.out'
+        # running bands.x with mpi seems to cause segfaults. I think this bug is tracked?
         bands.x < $BANDSIOPUT'.in' > $BANDSIOPUT'.out'
     done
 done
