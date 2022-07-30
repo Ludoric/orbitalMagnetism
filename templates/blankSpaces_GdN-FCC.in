@@ -40,7 +40,7 @@ ATOMIC_SPECIES
 Gd     157.25 Gd.GGA-PBE-paw-v1.0.UPF
 N      14.0067 N.oncvpsp.upf
 ATOMIC_POSITIONS crystal
-Gd           0.0000000000       0.0000000000       0.0000000000 
-N            0.5000000000       0.5000000000       0.5000000000 
+Gd           0.0000000000       0.0000000000       0.0000000000
+N            0.5000000000       0.5000000000       0.5000000000
 K_POINTS automatic
 %k% %k% %k% 0 0 0

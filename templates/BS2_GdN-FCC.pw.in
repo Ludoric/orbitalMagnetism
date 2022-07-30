@@ -21,12 +21,11 @@
   ibrav = 2
   A = 4.999
   nat = 2
-  nosym = .false.
+  nosym = .%nosym%.
   nspin = 2
   ntyp = 2
   nbnd = %nbnd% ! num Kohn-Sham states; 16 by default, 25(ish?) for calculation=band
-  occupations = 'smearing'
-  smearing = 'gauss'
+  occupations = '%occupations%'
   starting_magnetization(1) =   1.0
   starting_magnetization(2) =   0.0
 /

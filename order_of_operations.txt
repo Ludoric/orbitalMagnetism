@@ -12,7 +12,7 @@ and the number of k points
 
 If these numbers are set to the wrong value laksdj;flkajsd;
 
-We can see if convergence has occurred successfully by examining output parameters such as  
+We can see if convergence has occurred successfully by examining output parameters such as
 
 
 
@@ -22,17 +22,25 @@ We can see if convergence has occurred successfully by examining output paramete
 And now for band structure calculations.
 First the structure is allowed to relax (by running the same script as before, just specifying calculation='relax'.
 
-Then we run with calculation='bands'. Importantly, this time the we must specify a different set of k points to run the calculation on. 
+Then we run with calculation='bands'. Importantly, this time the we must specify a different set of k points to run the calculation on.
 I have written a (only slightly janky) python script to generate this (see bandplot_kpoints.py). My only resources when writing this script were half-remembered things that will had said over a week ago, the docs for pw.x, and the website http://lampx.tugraz.at/~hadley/ss1/bzones/fcc.php, which translated the labels for the points into their coordinates.
 
 
 
-Gamma-X: 2*pi/a
-Gamma-L: sqrt(3)*pi/a
-Gamma-W: sqrt(5)*pi/a
-Gamma-K: 3/sqrt(2)*pi/a
-Gamma-U: 3/sqrt(2)*pi/a
-K-W:     1/sqrt(2)*pi/a
-X-U:     1/sqrt(2)*pi/a
 
+Questions:
+How/when does QE know to use the results of the previoius calculations?
+i.e. when calculation='bands'? or for calculating k points
 
+Now for DOS:
+set calculation='nscf', occupations='tetrahedra', up the number of k points even more
+apparently also nosym = .TRUE.??
+
+input file should look a bit like:
+&DOS
+  prefix='(the one from the nscf calculation)',
+  outdir='(the one from the nscf calculation)',
+  fildos='(output file)',
+  ! emin=-9,  ! can probably use the default values for these
+  ! emax=16.0
+/
