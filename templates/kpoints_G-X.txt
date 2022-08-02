@@ -1,0 +1,4 @@
+K_POINTS tpiba_b
+2  ! total points = 40
+0.000 0.000 0.000   40  ! Gamma
+0.000 1.000 0.000   0   ! X

@@ -35,12 +35,3 @@ i.e. when calculation='bands'? or for calculating k points
 Now for DOS:
 set calculation='nscf', occupations='tetrahedra', up the number of k points even more
 apparently also nosym = .TRUE.??
-
-input file should look a bit like:
-&DOS
-  prefix='(the one from the nscf calculation)',
-  outdir='(the one from the nscf calculation)',
-  fildos='(output file)',
-  ! emin=-9,  ! can probably use the default values for these
-  ! emax=16.0
-/
