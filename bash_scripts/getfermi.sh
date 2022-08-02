@@ -1,7 +1,7 @@
 #!/bin/bash
 
-IN='tooBig/hubbardOut/*.pw.out'
-OUT="tooBig/hubbardOut/fermi.tsv"
+IN='tooBig/hubbard2Out/*.pw.out'
+OUT="tooBig/hubbard2Out/fermi.tsv"
 echo -e "hubbardU\tTotalE\tFermiE\tTotalS" > $OUT
 for F in $IN ; do
     readarray -d _ -t Farr <<< "$F"

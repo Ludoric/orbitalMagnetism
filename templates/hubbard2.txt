@@ -1,0 +1,3 @@
+HUBBARD (atomic)
+U Gd-4f %Gd-4f%
+U Gd-5d %Gd-5d%

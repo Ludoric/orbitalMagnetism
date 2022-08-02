@@ -1,8 +1,8 @@
 #!/bin/bash
-#SBATCH --job-name=relax+U_GdN-FCC
-#SBATCH --time=00-08:00:00
-#SBATCH --output=/nfs/scratch2/trewicedwa/GdN_hubbard/logs/hubbard1.out
-#SBATCH --error=/nfs/scratch2/trewicedwa/GdN_hubbard/logs/hubbard1.err
+#SBATCH --job-name=HBx2_GdN-FCC
+#SBATCH --time=00-18:00:00
+#SBATCH --output=/nfs/scratch2/trewicedwa/GdN_hubbard2/logs/hubbard1.out
+#SBATCH --error=/nfs/scratch2/trewicedwa/GdN_hubbard2/logs/hubbard1.err
 #SBATCH --partition=parallel
 #SBATCH --ntasks=64
 #SBATCH --cpus-per-task=1
@@ -11,23 +11,32 @@
 #SBATCH --nodes=2
 #SBATCH --constraint="AMD"
 
-module load intel/2022a
-module load QuantumESPRESSO/7.1
-
-SRC="/nfs/home/trewicedwa/orbitalMagnetism"
 # SRC=$(dirname $(dirname $(realpath ${BASH_SOURCE})))
-SCRATCH="/nfs/scratch2/trewicedwa/GdN_hubbard"
+SRC="/nfs/home/trewicedwa/orbitalMagnetism"
+SCRATCH="/nfs/scratch2/trewicedwa/GdN_hubbard2"
+
+DO_PW_RELAX=true
+DO_PW_BANDS=true
+DO_BANDS=true
+DO_PW_DOS=false
+DO_DOS=false
+
+# set this to true, or nothing will happen when you run it for real
+DO_COMPUTE_ANYTHING=false
 
 
 PWTEMPLATE="${SRC}/templates/BS2_GdN-FCC.pw.in"
 BANDSTEMPLATE="${SRC}/templates/BS_bands.bands.in"
 DOSTEMPLATE="${SRC}/templates/BS.dos.in"
 
-
-PREFIX='hubbard'
-HUBBARD="HUBBARD (ortho-atomic)\nU Gd-4f "
+# Prefix should change between cells, the title can change runs of pw.x
+# (the title is only of interest to the operator)
+PREPREFIX='HBx2'
+# HUBBARD="HUBBARD (ortho-atomic)\nU Gd-4f "
+HUBBARD_FILE="${SRC}/templates/hubbard2.txt"
 ECUTRHO=320
 ECUTWFC=80
+HU_GD_4F=8.4
 
 R_CALCULATION='relax'
 R_NBND=16
@@ -38,7 +47,7 @@ NOSYM='false'
 
 B_CALCULATION='bands'
 B_NBND=25
-B_K_FILE="${SRC}/templates/kpoints.txt" # actually, are you sure about that????
+B_K_FILE="${SRC}/templates/kpoints_G-X.txt"
 
 D_CALCULATION='nscf'
 D_NBND=25
@@ -48,19 +57,27 @@ D_OCCUPATIONS='tetrahedra'
 D_NOSYM='true'
 
 
-DO_PW_RELAX=0
-DO_PW_BANDS=0
-DO_BANDS=0
-DO_PW_DOS=1
-DO_DOS=1
 
+AWKSTRING='{
+    printf "\t\tRT: %02d:%02d:%07.4f\n",
+        ($1-$2)/3600, ($1-$2)%3600/60, ($1-$2)%60
+    }'
 
-for HU_GD_4F in $(seq -1.0 0.25 15.0)
-do
-    echo -e "Gd-4f: ${HU_GD_4F}" # NEW CALCULATION
-    TITLE="H_Gd4f_${HU_GD_4F}_GdN-FCC"
+ # apparently this is the "correct/safe" way to do if statements
+ #     safety is unnecessary here, but good habits and all that
+if [ "$DO_COMPUTE_ANYTHING" = true ]; then
+    module load intel/2022a
+    module load QuantumESPRESSO/7.1
+fi
 
-    if [$DO_PW_RELAX] ; then
+for HU_GD_5D in $(seq 0.1 0.1 3.0); do
+    # The value for prefix must reflect the values looped through
+    PREFIX="H_Gd-5d_${HU_GD_5D}_${PREPREFIX}"
+    TITLE=$PREFIX
+    echo -e "Gd-5d: ${HU_GD_5D}" # NEW CELL
+
+    if [ "$DO_PW_RELAX" = true ]; then
+        START=$(date +%s.%N)
         RPWIOPUT="${SCRATCH}/${R_CALCULATION}${TITLE}.pw"
         echo -e "\tPW:relax   \t${RPWIOPUT}" # NEW CALCULATION
         sed -e "s/%title%/$TITLE/g; s+%outdir%+${SCRATCH}/out/+g;" \
@@ -71,12 +88,20 @@ do
             $PWTEMPLATE > $RPWIOPUT'.in'
 
         sed -e "s/%k%/${R_K}/g" $R_K_FILE >> $RPWIOPUT'.in'
-        echo -e "${HUBBARD}${HU_GD_4F}\n" >> $RPWIOPUT'.in'
+        sed -e "s/%Gd-4f%/${HU_GD_4F}/g" \
+            -e "s/%Gd-5d%/${HU_GD_5D}/g" \
+            $HUBBARD_FILE >> $RPWIOPUT'.in'
+        echo "" >> $RPWIOPUT'.in'
 
-        mpirun -np 64 pw.x -npool 4 -in $RPWIOPUT'.in' > $RPWIOPUT'.out'
+        if [ "$DO_COMPUTE_ANYTHING" = true ]; then
+            mpirun -np 64 pw.x -npool 4 -in $RPWIOPUT'.in' > $RPWIOPUT'.out'
+        fi
+        END=$(date +%s.%N)
+        echo "$END $START" | awk "$AWKSTRING"
     fi
 
-    if [$DO_PW_BANDS] ; then
+    if [ "$DO_PW_BANDS" = true ]; then
+        START=$(date +%s.%N)
         BPWIOPUT="${SCRATCH}/${B_CALCULATION}${TITLE}.pw"
         echo -e "\tPW:band    \t${BPWIOPUT}" # NEW CALCULATION
         sed -e "s/%title%/$TITLE/g; s+%outdir%+${SCRATCH}/out/+g;" \
@@ -87,14 +112,22 @@ do
             $PWTEMPLATE > $BPWIOPUT'.in'
 
         cat $B_K_FILE >> $BPWIOPUT'.in'
-        echo -e "${HUBBARD}${HU_GD_4F}\n" >> $BPWIOPUT'.in'
+        sed -e "s/%Gd-4f%/${HU_GD_4F}/g" \
+            -e "s/%Gd-5d%/${HU_GD_5D}/g" \
+            $HUBBARD_FILE >> $BPWIOPUT'.in'
+            echo "" >> $RPWIOPUT'.in'
 
-        mpirun -np 64 pw.x -npool 4 -in $BPWIOPUT'.in' > $BPWIOPUT'.out'
+        if [ "$DO_COMPUTE_ANYTHING" = true ]; then
+            mpirun -np 64 pw.x -npool 4 -in $BPWIOPUT'.in' > $BPWIOPUT'.out'
+        fi
+        END=$(date +%s.%N)
+        echo "$END $START" | awk "$AWKSTRING"
     fi
 
-    if [$DO_BANDS] ; then
+    if [ "$DO_BANDS" = true ]; then
         for SPIN in 1 2
         do
+            START=$(date +%s.%N)
             BANDSIOPUT="${SCRATCH}/${TITLE}-S${SPIN}.bands"
             echo -e "\tBANDS:S${SPIN}   \t${BANDSIOPUT}" # NEW CALCULATION
 
@@ -102,15 +135,22 @@ do
                 -e "s+%filband%+${BANDSIOPUT}+g; s/%spin_component%/$SPIN/g;" \
                 $BANDSTEMPLATE > $BANDSIOPUT'.in'
 
-            # mpirun -np 64 bands.x -npoop 4 -in  $BANDSIOPUT'.in' > $BANDSIOPUT'.out'
-            # running bands.x with mpi seems to cause segfaults. I think this bug is tracked?
-            bands.x < $BANDSIOPUT'.in' > $BANDSIOPUT'.out'
+            if [ "$DO_COMPUTE_ANYTHING" = true ]; then
+                # mpirun -np 64 bands.x -npoop 4 -in  $BANDSIOPUT'.in' \
+                #     > $BANDSIOPUT'.out'
+                # running bands.x with mpi seems to cause segfaults.
+                #I think this bug is tracked?
+                bands.x < $BANDSIOPUT'.in' > $BANDSIOPUT'.out'
+            fi
+            END=$(date +%s.%N)
+            echo "$END $START" | awk "$AWKSTRING"
         done
     fi
 
-    if [$DO_PW_DOS] ; then
+    if [ "$DO_PW_DOS" = true ]; then
+        START=$(date +%s.%N)
         DPWIOPUT="${SCRATCH}/${D_CALCULATION}${TITLE}.pw"
-        echo -e "\tPW:nscf:DOS \t${RPWIOPUT}" # NEW CALCULATION
+        echo -e "\tPW:nscf:DOS \t${DPWIOPUT}" # NEW CALCULATION
         sed -e "s/%title%/$TITLE/g; s+%outdir%+${SCRATCH}/out/+g;" \
             -e "s+%pseudo_dir%+${SRC}/pseudo/+g; s/%prefix%/${PREFIX}/g;" \
             -e "s/%ecutrho%/${ECUTRHO}/g; s/%ecutwfc%/${ECUTWFC}/g;" \
@@ -119,20 +159,32 @@ do
             $PWTEMPLATE > $DPWIOPUT'.in'
 
         sed -e "s/%k%/${D_K}/g" $D_K_FILE >> $DPWIOPUT'.in'
-        echo -e "${HUBBARD}${HU_GD_4F}\n" >> $DPWIOPUT'.in'
+        sed -e "s/%Gd-4f%/${HU_GD_4F}/g" \
+            -e "s/%Gd-5d%/${HU_GD_5D}/g" \
+            $HUBBARD_FILE >> $DPWIOPUT'.in'
+            echo "" >> $RPWIOPUT'.in'
 
-        mpirun -np 64 pw.x -npool 4 -in $DPWIOPUT'.in' > $DPWIOPUT'.out'
+        if [ "$DO_COMPUTE_ANYTHING" = true ]; then
+            mpirun -np 64 pw.x -npool 4 -in $DPWIOPUT'.in' > $DPWIOPUT'.out'
+        fi
+        END=$(date +%s.%N)
+        echo "$END $START" | awk "$AWKSTRING"
     fi
 
-    if [$DO_DOS] ; then
+    if [ "$DO_DOS" = true ]; then
+        START=$(date +%s.%N)
         DOSIOPUT="${SCRATCH}/${TITLE}.dos"
         echo -e "\tDOS:       \t${DOSIOPUT}" # NEW CALCULATION
         sed -e "s/%prefix%/$PREFIX/g; s+%outdir%+$SCRATCH/out/+g;" \
-            -e "s+%fildos%+${BANDSIOPUT}+g;" \
+            -e "s+%fildos%+${DOSIOPUT}+g;" \
             $DOSTEMPLATE > $DOSIOPUT'.in'
 
-        # I haven't tried this with mpi
-        dos.x < $DOSIOPUT'.in' > $DOSIOPUT'.out'
+        if [ "$DO_COMPUTE_ANYTHING" = true ]; then
+            # I haven't tried this with mpi
+            dos.x < $DOSIOPUT'.in' > $DOSIOPUT'.out'
+        fi
+        END=$(date +%s.%N)
+        echo "$END $START" | awk "$AWKSTRING"
     fi
-
 done
+echo -e "\nSCRIPT FINISHED! (you can stop waiting now)"

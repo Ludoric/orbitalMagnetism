@@ -5,6 +5,7 @@ import matplotlib as mpl
 import bandplot_kpoints as kp
 from pathlib import Path
 import re
+# import mpl_sqrtaxis
 
 mpl.rcParams["savefig.format"] = 'pdf'
 
@@ -69,7 +70,7 @@ def loadLotsOfData(bandFName, zeroFN=None, zeroN='FermiE', orbital='Gd4f'):
         else:
             print('Spin not known from file name, defaulting to ↑')
             spin = '↑'
-        fparts = re.split('/|_|-', fstr)
+        fparts = re.split('/|_', fstr)
         HU = float(fparts[fparts.index(orbital)+1])
         if zeroFN is None:
             bandD.setdefault(HU, {})[spin] = readBandFile(file)
@@ -78,20 +79,78 @@ def loadLotsOfData(bandFName, zeroFN=None, zeroN='FermiE', orbital='Gd4f'):
     return bandD
 
 
+def readDOS(dosFName, ax=None):
+    # energy, dosup, dosdw, idos
+    with open(dosFName) as f:
+        FermiE = float(f.readline().split()[-2])
+        datdos = np.loadtxt(f, unpack=True)
+        datdos[0] -= FermiE
+    return FermiE, datdos
+
+
 def removeDuplicateLabels(ax):
     handles, labels = ax.get_legend_handles_labels()
     by_label = dict(zip(labels, handles))
     ax.legend(by_label.values(), by_label.keys())
 
 
-def plotData(datup, datdown=None):
-    f = plt.figure()
-    ax = f.add_subplot()
+def plotDOS(datdos, ax=None, onY=False):
+    if ax:
+        f = None
+    else:
+        f = plt.figure()
+        f.tight_layout()
+        ax = f.add_subplot()
+    if onY:
+        Yup = Ydw = datdos[0]
+        Xup = datdos[1]
+        Xdw = datdos[2]
+    else:
+        Xup = Xdw = datdos[0]
+        Yup = datdos[1]
+        Ydw = datdos[2]
+    # energy, dosup, dosdw, idos
+    if datdos.shape[0] == 4:
+        ax.plot(Xdw, Ydw, ':b', zorder=2, label='Minority Spin (↓)')
+    elif datdos.shape[0] != 3:
+        print(f"HELP! datdos is the wrong shape! It's {datdos.shape}")
+    ax.plot(Xup, Yup, '-r', zorder=1, label='Majority Spin (↑)')
+    # ax.plot(datdos[0], datdos[3], '-b', zorder=1, label='idos')
+    if onY:
+        ax.axhline(y=0, ls='--', c='k', lw=1, zorder=0)
+        ax.set_xticks([])
+        ax.set_xlabel('DOS')
+        ax.set_ylabel('Energy [eV]')
+        ax.set_xlim(0, None)
+        # ax.set_xscale('log')
+    else:
+        ax.axvline(x=0, ls='--', c='k', lw=1, zorder=0)
+        ax.set_xlabel('Energy [eV]')
+        ax.set_ylabel('DOS')
+        ax.set_yticks([])
+        ax.set_ylim(0, None)
+        # ax.set_yscale('log')
+    # mpl.scale.register_scale(mpl_sqrtaxis.SquareRootScale)
+    # ax.set_yscale('squareroot')
+    # ax.set_yticks(np.arange(0, 9, 2)**2)
+    # ax.set_yticks(np.arange(0, 8.5, 0.5)**2, minor=True)
+
+    ax.legend()
+    return f, ax
+
+
+def plotBands(datup, datdw=None, ax=None, nolegend=False):
+    if ax:
+        f = None
+    else:
+        f = plt.figure()
+        f.tight_layout()
+        ax = f.add_subplot()
     horiz = np.linspace(0, 1, datup.shape[0])
-    if datdown is not None:
-        if np.array_equal(datup[:, :3], datdown[:, :3]):
-            for i in range(3, datdown.shape[1]):
-                ax.plot(horiz, datdown[:, i], ':b', zorder=2,
+    if datdw is not None:
+        if np.array_equal(datup[:, :3], datdw[:, :3]):
+            for i in range(3, datdw.shape[1]):
+                ax.plot(horiz, datdw[:, i], ':b', zorder=2,
                         label='Minority Spin (↓)')
         else:
             print('Spin up and spin down coordinates do not match.')
@@ -112,40 +171,58 @@ def plotData(datup, datdown=None):
     ax.tick_params(axis='y', color='k', width=1)
     ax.axhline(0, c='k', linewidth=1, zorder=0)
     ax.set_ylabel('Energy [eV]')
-    f.tight_layout()
-    if datdown is not None:
+    if datdw is not None and not nolegend:
         removeDuplicateLabels(ax)
     return f, ax
 
 
-def plotKvsU(bandD, kpoint='Gamma', orbital='Gd4f', individual=False):
+def plotKvsHU(bandD, kpoint='Gamma', orbital='Gd4f', individual=False,
+              ax=None):
     # kindex = [kp.nameFromKvec(r) for r in (bandD.values(), )[0]['↑'][:, :3]
     #           ].index(kpoint)
     for kindex, r in enumerate(tuple(bandD.values())[0]['↑'][:, :3]):
         if kp.nameFromKvec(r) == kpoint:
             break
-    Sup, Sdo, Hs = [], [], []
+    Sup, Sdw, Hs = [], [], []
     for HU, S in sorted(bandD.items()):
         if individual:
-            plotData(S['↑'], S.get('↓'))
+            plotBands(S['↑'], S.get('↓'))
         Sup.append(S['↑'][kindex, 3:])
-        Sdo.append(S['↓'][kindex, 3:])
+        Sdw.append(S['↓'][kindex, 3:])
         Hs.append(HU)
     # sort all three arrays by the Hubbard U parameter
-    Sup, Sdo, Hs = np.array(Sup), np.array(Sdo), np.array(Hs)
+    Sup, Sdw, Hs = np.array(Sup), np.array(Sdw), np.array(Hs)
     arginds = Hs.argsort()
-    Sup, Sdo, Hs = Sup[arginds], Sdo[arginds], Hs[arginds]
+    Sup, Sdw, Hs = Sup[arginds], Sdw[arginds], Hs[arginds]
 
-    f = plt.figure()
-    ax = f.add_subplot()
+    if ax:
+        f = None
+    else:
+        f = plt.figure()
+        f.tight_layout()
+        ax = f.add_subplot()
     ax.plot(Hs, Sup[:, 3:], '-r', zorder=1, label='Majority Spin (↑)')
-    ax.plot(Hs, Sdo[:, 3:], ':b', zorder=2, label='Minority Spin (↓)')
+    ax.plot(Hs, Sdw[:, 3:], ':b', zorder=2, label='Minority Spin (↓)')
     removeDuplicateLabels(ax)
     ax.set_ylabel('Energy [eV]')
     ax.set_xlabel(f'Hubbard U for {orbital} [eV]')
     ax.margins(x=0)
-    f.tight_layout()
     return f, ax
+
+
+def plotBandsDos(dosFN, bandSupFN, bandSdwFN):
+    FermiE, datdos = readDOS(dosFN)
+    dup = readBandFile(bandSupFN, zeroPoint=FermiE)
+    ddown = readBandFile(bandSdwFN, zeroPoint=FermiE)
+    f, (ax1, ax2) = plt.subplots(
+        ncols=2, sharey=True, figsize=(12, 6),
+        gridspec_kw={'width_ratios': [3, 1]})
+    plotBands(dup, ddown, ax=ax1, nolegend=True)
+    plotDOS(datdos, ax=ax2, onY=True)
+    ax2.set_ylabel(None)
+    f.tight_layout()
+    f.subplots_adjust(wspace=0)
+    return f, (ax1, ax2)
 
 
 if __name__ == '__main__':
@@ -154,11 +231,14 @@ if __name__ == '__main__':
     # ddown = readBandFile('bands2_GdN-FCC-S2.bands')
     # dup = readBandFile('bands-up_GdN-FCC.bands')
     # ddown = readBandFile('bands-down_GdN-FCC.bands')
-    # plotData(dup, ddown)
-    bandD = loadLotsOfData('../tooBig/hubbardOut/',
-                           '../tooBig/hubbardOut/fermi.tsv')
-    plotKvsU(bandD, kpoint='Gamma', individual=False)
+    # plotBands(dup, ddown)
+    # bandD = loadLotsOfData('../tooBig/hubbardOut/',
+    #                        '../tooBig/hubbardOut/fermi.tsv')
+    # plotKvsHU(bandD, kpoint='Gamma', individual=False)
     # thus if the Gd4f band is 7.8eV below the fermi level, U should be 8.4eV
     # (from GdN THIN FILMS: BULK AND LOCAL ELECTRONIC...)
+    plotBandsDos('../tooBig/hubbardOut/H_Gd4f_8.00_GdN-FCC.dos',
+                 '../tooBig/hubbardOut/H_Gd4f_8.00_GdN-FCC-S1.bands',
+                 '../tooBig/hubbardOut/H_Gd4f_8.00_GdN-FCC-S2.bands')
 
     plt.show()
