@@ -52,7 +52,7 @@ B_K_FILE="${SRC}/templates/kpoints_G-X.txt"
 D_CALCULATION='nscf'
 D_NBND=25
 D_K_FILE="${SRC}/templates/relax_k_BS.txt"
-D_K=21
+D_K=17
 D_OCCUPATIONS='tetrahedra'
 D_NOSYM='true'
 
