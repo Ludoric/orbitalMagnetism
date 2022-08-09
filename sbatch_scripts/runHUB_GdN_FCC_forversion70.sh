@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=HBx2_GdN-FCC
 #SBATCH --time=00-18:00:00
-#SBATCH --output=/nfs/scratch2/trewicedwa/GdN_hubbard2/logs/hubbard1.out
-#SBATCH --error=/nfs/scratch2/trewicedwa/GdN_hubbard2/logs/hubbard1.err
+#SBATCH --output=/nfs/scratch2/trewicedwa/GdN_HU1_v70/logs/GdN_HU1_v70.out
+#SBATCH --error=/nfs/scratch2/trewicedwa/GdN_HU1_v70/logs/GdN_HU1_v70.err
 #SBATCH --partition=parallel
 #SBATCH --ntasks=64
 #SBATCH --cpus-per-task=1
@@ -13,7 +13,8 @@
 
 # SRC=$(dirname $(dirname $(realpath ${BASH_SOURCE})))
 SRC="/nfs/home/trewicedwa/orbitalMagnetism"
-SCRATCH="/nfs/scratch2/trewicedwa/GdN_hubbard2"
+SCRATCH="/nfs/scratch2/trewicedwa/GdN_HU1_v70"
+BINLOC="/nfs/home/trewicedwa/qe-7.0/bin"
 
 DO_PW_RELAX=true
 DO_PW_BANDS=true
@@ -25,28 +26,26 @@ DO_DOS=false
 DO_COMPUTE_ANYTHING=false
 
 
-PWTEMPLATE="${SRC}/templates/BS2_GdN-FCC.pw.in"
+PWTEMPLATE="${SRC}/templates/BS2_GdN-FCC_forversion70.pw.in"
 BANDSTEMPLATE="${SRC}/templates/BS_bands.bands.in"
 DOSTEMPLATE="${SRC}/templates/BS.dos.in"
 
 # Prefix should change between cells, the title can change runs of pw.x
 # (the title is only of interest to the operator)
-PREPREFIX='HBx2'
-# HUBBARD="HUBBARD (ortho-atomic)\nU Gd-4f "
-HUBBARD_FILE="${SRC}/templates/hubbard2.txt"
+PREPREFIX='HB1_v70'
 ECUTRHO=320
 ECUTWFC=80
-HU_GD_4F=8.4
 
 R_CALCULATION='vc-relax'
 R_K_FILE="${SRC}/templates/relax_k_BS.txt"
 R_K=14
+NBND=26
 OCCUPATIONS='smearing'
 NOSYM='false'
-NBND=26
+HU_GD_5D='1e-5'
 
 B_CALCULATION='bands'
-B_K_FILE="${SRC}/templates/kpoints_G-X.txt"
+B_K_FILE="${SRC}/templates/kpoints.txt"
 
 D_CALCULATION='nscf'
 D_K_FILE="${SRC}/templates/relax_k_BS.txt"
@@ -64,15 +63,14 @@ AWKSTRING='{
  # apparently this is the "correct/safe" way to do if statements
  #     safety is unnecessary here, but good habits and all that
 if [ "$DO_COMPUTE_ANYTHING" = true ]; then
-    module load intel/2022a
-    module load QuantumESPRESSO/7.1
+    module load intel/2021b
 fi
 
-for HU_GD_5D in $(seq 0.1 0.1 3.0); do
+for HU_GD_4F in $(seq 1.0 0.5 15.0); do
     # The value for prefix must reflect the values looped through
-    PREFIX="H_Gd-5d_${HU_GD_5D}_${PREPREFIX}"
+    PREFIX="${PREPREFIX}_Gd4f${HU_GD_4F}"
     TITLE=$PREFIX
-    echo -e "Gd-5d: ${HU_GD_5D}" # NEW CELL
+    echo -e "Gd-4f: ${HU_GD_4F}" # NEW CELL
 
     if [ "$DO_PW_RELAX" = true ]; then
         START=$(date +%s.%N)
@@ -92,7 +90,7 @@ for HU_GD_5D in $(seq 0.1 0.1 3.0); do
         echo "" >> $RPWIOPUT'.in'
 
         if [ "$DO_COMPUTE_ANYTHING" = true ]; then
-            mpirun -np 64 pw.x -npool 4 -in $RPWIOPUT'.in' > $RPWIOPUT'.out'
+            mpirun -np 64 $BINLOC/pw.x -npool 4 -in $RPWIOPUT'.in' > $RPWIOPUT'.out'
         fi
         END=$(date +%s.%N)
         echo "$END $START" | awk "$AWKSTRING"
@@ -116,7 +114,7 @@ for HU_GD_5D in $(seq 0.1 0.1 3.0); do
             echo "" >> $RPWIOPUT'.in'
 
         if [ "$DO_COMPUTE_ANYTHING" = true ]; then
-            mpirun -np 64 pw.x -npool 4 -in $BPWIOPUT'.in' > $BPWIOPUT'.out'
+            mpirun -np 64 $BINLOC/pw.x -npool 4 -in $BPWIOPUT'.in' > $BPWIOPUT'.out'
         fi
         END=$(date +%s.%N)
         echo "$END $START" | awk "$AWKSTRING"
@@ -138,7 +136,7 @@ for HU_GD_5D in $(seq 0.1 0.1 3.0); do
                 #     > $BANDSIOPUT'.out'
                 # running bands.x with mpi seems to cause segfaults.
                 #I think this bug is tracked?
-                bands.x < $BANDSIOPUT'.in' > $BANDSIOPUT'.out'
+                $BINLOC/bands.x < $BANDSIOPUT'.in' > $BANDSIOPUT'.out'
             fi
             END=$(date +%s.%N)
             echo "$END $START" | awk "$AWKSTRING"
@@ -163,7 +161,7 @@ for HU_GD_5D in $(seq 0.1 0.1 3.0); do
             echo "" >> $RPWIOPUT'.in'
 
         if [ "$DO_COMPUTE_ANYTHING" = true ]; then
-            mpirun -np 64 pw.x -npool 4 -in $DPWIOPUT'.in' > $DPWIOPUT'.out'
+            mpirun -np 64 $BINLOC/pw.x -npool 4 -in $DPWIOPUT'.in' > $DPWIOPUT'.out'
         fi
         END=$(date +%s.%N)
         echo "$END $START" | awk "$AWKSTRING"
@@ -179,7 +177,7 @@ for HU_GD_5D in $(seq 0.1 0.1 3.0); do
 
         if [ "$DO_COMPUTE_ANYTHING" = true ]; then
             # I haven't tried this with mpi
-            dos.x < $DOSIOPUT'.in' > $DOSIOPUT'.out'
+            $BINLOC/dos.x < $DOSIOPUT'.in' > $DOSIOPUT'.out'
         fi
         END=$(date +%s.%N)
         echo "$END $START" | awk "$AWKSTRING"

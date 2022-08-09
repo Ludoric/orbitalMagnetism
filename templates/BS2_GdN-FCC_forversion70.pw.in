@@ -22,10 +22,14 @@
   nosym = .%nosym%.
   nspin = 2
   ntyp = 2
-  nbnd = %nbnd% ! num Kohn-Sham states; 16 by default, 25(ish?) for calculation=band
+  nbnd = %nbnd% ! num Kohn-Sham states
   occupations = '%occupations%'
   starting_magnetization(1) =   1.0
   starting_magnetization(2) =   0.0
+  lda_plus_u=.true.
+  lda_plus_u_kind=0
+  Hubbard_U(1) = %HU%
+  Hubbard_U_back(1) = %HU_back%
 /
 &ELECTRONS
   conv_thr =   1.6000000000d-09
