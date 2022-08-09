@@ -1,19 +1,18 @@
 #!/bin/bash
-#SBATCH --job-name=HBx2_GdN-FCC
-#SBATCH --time=00-18:00:00
-#SBATCH --output=/nfs/scratch2/trewicedwa/GdN_HU1_v70/logs/GdN_HU1_v70.out
-#SBATCH --error=/nfs/scratch2/trewicedwa/GdN_HU1_v70/logs/GdN_HU1_v70.err
-#SBATCH --partition=parallel
-#SBATCH --ntasks=64
+#SBATCH --job-name=HU2_v70_GdN
+#SBATCH --time=00-05:00:00
+#SBATCH --output=/nfs/scratch2/trewicedwa/GdN_HU2_v70/logs/GdN_HU2_v70.out
+#SBATCH --error=/nfs/scratch2/trewicedwa/GdN_HU2_v70/logs/GdN_HU2_v70.err
+#SBATCH --partition=quicktest
+#SBATCH --ntasks=128
 #SBATCH --cpus-per-task=1
-#SBATCH --tasks-per-node=32
+#SBATCH --tasks-per-node=64
 #SBATCH --mem-per-cpu=1G
 #SBATCH --nodes=2
-#SBATCH --constraint="AMD"
 
 # SRC=$(dirname $(dirname $(realpath ${BASH_SOURCE})))
 SRC="/nfs/home/trewicedwa/orbitalMagnetism"
-SCRATCH="/nfs/scratch2/trewicedwa/GdN_HU1_v70"
+SCRATCH="/nfs/scratch2/trewicedwa/GdN_HU2_v70"
 BINLOC="/nfs/home/trewicedwa/qe-7.0/bin"
 
 DO_PW_RELAX=true
@@ -23,7 +22,7 @@ DO_PW_DOS=false
 DO_DOS=false
 
 # set this to true, or nothing will happen when you run it for real
-DO_COMPUTE_ANYTHING=false
+DO_COMPUTE_ANYTHING=true
 
 
 PWTEMPLATE="${SRC}/templates/BS2_GdN-FCC_forversion70.pw.in"
@@ -32,7 +31,7 @@ DOSTEMPLATE="${SRC}/templates/BS.dos.in"
 
 # Prefix should change between cells, the title can change runs of pw.x
 # (the title is only of interest to the operator)
-PREPREFIX='HB1_v70'
+PREPREFIX='GdN-HB2-v70'
 ECUTRHO=320
 ECUTWFC=80
 
@@ -42,7 +41,7 @@ R_K=14
 NBND=26
 OCCUPATIONS='smearing'
 NOSYM='false'
-HU_GD_5D='1e-5'
+HU_GD_4F=8.4
 
 B_CALCULATION='bands'
 B_K_FILE="${SRC}/templates/kpoints.txt"
@@ -66,11 +65,11 @@ if [ "$DO_COMPUTE_ANYTHING" = true ]; then
     module load intel/2021b
 fi
 
-for HU_GD_4F in $(seq 1.0 0.5 15.0); do
+for HU_GD_5D in $(seq 0.2 0.2 6.0); do
     # The value for prefix must reflect the values looped through
-    PREFIX="${PREPREFIX}_Gd4f${HU_GD_4F}"
+    PREFIX="${PREPREFIX}_Gd-5d_${HU_GD_5D}_"
     TITLE=$PREFIX
-    echo -e "Gd-4f: ${HU_GD_4F}" # NEW CELL
+    echo -e "Gd-5d: ${HU_GD_5D}" # NEW CELL
 
     if [ "$DO_PW_RELAX" = true ]; then
         START=$(date +%s.%N)
@@ -81,13 +80,10 @@ for HU_GD_4F in $(seq 1.0 0.5 15.0); do
             -e "s/%ecutrho%/${ECUTRHO}/g; s/%ecutwfc%/${ECUTWFC}/g;" \
             -e "s/%nbnd%/${NBND}/g; s/%calculation%/${R_CALCULATION}/g;" \
             -e "s/%occupations%/${OCCUPATIONS}/g; s/%nosym%/${NOSYM}/g;" \
+            -e "s/%HU%/${HU_GD_4F}/g; s/%HU_back%/${HU_GD_5D}/g;" \
             $PWTEMPLATE > $RPWIOPUT'.in'
 
         sed -e "s/%k%/${R_K}/g" $R_K_FILE >> $RPWIOPUT'.in'
-        sed -e "s/%Gd-4f%/${HU_GD_4F}/g" \
-            -e "s/%Gd-5d%/${HU_GD_5D}/g" \
-            $HUBBARD_FILE >> $RPWIOPUT'.in'
-        echo "" >> $RPWIOPUT'.in'
 
         if [ "$DO_COMPUTE_ANYTHING" = true ]; then
             mpirun -np 64 $BINLOC/pw.x -npool 4 -in $RPWIOPUT'.in' > $RPWIOPUT'.out'
@@ -105,13 +101,10 @@ for HU_GD_4F in $(seq 1.0 0.5 15.0); do
             -e "s/%ecutrho%/${ECUTRHO}/g; s/%ecutwfc%/${ECUTWFC}/g;" \
             -e "s/%nbnd%/${NBND}/g; s/%calculation%/${B_CALCULATION}/g;" \
             -e "s/%occupations%/${OCCUPATIONS}/g; s/%nosym%/${NOSYM}/g;" \
+            -e "s/%HU%/${HU_GD_4F}/g; s/%HU_back%/${HU_GD_5D}/g;" \
             $PWTEMPLATE > $BPWIOPUT'.in'
 
         cat $B_K_FILE >> $BPWIOPUT'.in'
-        sed -e "s/%Gd-4f%/${HU_GD_4F}/g" \
-            -e "s/%Gd-5d%/${HU_GD_5D}/g" \
-            $HUBBARD_FILE >> $BPWIOPUT'.in'
-            echo "" >> $RPWIOPUT'.in'
 
         if [ "$DO_COMPUTE_ANYTHING" = true ]; then
             mpirun -np 64 $BINLOC/pw.x -npool 4 -in $BPWIOPUT'.in' > $BPWIOPUT'.out'
@@ -152,13 +145,10 @@ for HU_GD_4F in $(seq 1.0 0.5 15.0); do
             -e "s/%ecutrho%/${ECUTRHO}/g; s/%ecutwfc%/${ECUTWFC}/g;" \
             -e "s/%nbnd%/${NBND}/g; s/%calculation%/${D_CALCULATION}/g;" \
             -e "s/%occupations%/${D_OCCUPATIONS}/g; s/%nosym%/${D_NOSYM}/g;" \
+            -e "s/%HU%/${HU_GD_4F}/g; s/%HU_back%/${HU_GD_5D}/g;" \
             $PWTEMPLATE > $DPWIOPUT'.in'
 
         sed -e "s/%k%/${D_K}/g" $D_K_FILE >> $DPWIOPUT'.in'
-        sed -e "s/%Gd-4f%/${HU_GD_4F}/g" \
-            -e "s/%Gd-5d%/${HU_GD_5D}/g" \
-            $HUBBARD_FILE >> $DPWIOPUT'.in'
-            echo "" >> $RPWIOPUT'.in'
 
         if [ "$DO_COMPUTE_ANYTHING" = true ]; then
             mpirun -np 64 $BINLOC/pw.x -npool 4 -in $DPWIOPUT'.in' > $DPWIOPUT'.out'
