@@ -16,7 +16,7 @@ module load QuantumESPRESSO/7.1
 
 SRC="/nfs/home/trewicedwa/"
 SCRA="/nfs/scratch2/trewicedwa/GdN_relax_band/"
-INPUTF="${SRC}qe/blankSpaces_GdN-FCC.in" 
+INPUTF="${SRC}qe/blankSpaces_GdN-FCC.in"
 R_TITLE="relax_GdN-FCC"
 
 CINPUTF="${SCRA}${R_TITLE}.in"
@@ -27,4 +27,3 @@ sed -e"s/%title%/$R_TITLE/g; s+%outdir%+${SCRA}out/+g; s/%ecutrho%/320/g;" \
     $INPUTF > $CINPUTF
 
 mpirun -np 64 pw.x -npool 4 -in $CINPUTF > $COUTPUTF
-
