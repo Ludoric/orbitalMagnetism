@@ -65,7 +65,7 @@ if [ "$DO_COMPUTE_ANYTHING" = true ]; then
     module load intel/2021b
 fi
 
-for HU_GD_5D in $(seq 0.2 0.2 6.0); do
+for HU_GD_5D in $(seq 0.2 0.2 8.0); do
     # The value for prefix must reflect the values looped through
     PREFIX="${PREPREFIX}_Gd-5d_${HU_GD_5D}_"
     TITLE=$PREFIX

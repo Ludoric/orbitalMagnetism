@@ -8,46 +8,47 @@ def main():
         # MAKE THIS WORK WITH CELLS OTHER THAN FCC!
         print('Ggenerate k points for band plots using QUANTUM EXPRESSO')
         print('Usage:')
-        print('\tbandplot_kpoints.py NUM_POINTS ROUTE')
+        print('\tbandplot_kpoints.py NUM_POINTS CELL [ROUTE]')
         print('\tWhere NUM_POINTS is an integer')
+        print('\tCELL is the name of a unit cell')
         print('\tand ROUTE is a string of labels of critical points')
         print("\t\t('|' can be used to create a dicontinuity between points)")
-        print("\te.g.: ./bandplot_kpoints.py 100 'ΓXWKΓLUWLK|UX'\n")
+        print("\te.g.: ./bandplot_kpoints.py 100 FCC 'ΓXWKΓLUWLK|UX'\n")
         return
     if sys.argv[1].replace('.', '', 1).isdigit():
         NPts = float(sys.argv[1])
     else:
         print('First argument must be a number')
         return
-    if len(sys.argv) == 2:
-        # this ones stupid: 'ΓXWKΓLKWLUXUW'
-        # route = 'ΓXWKΓLUWLK|UX'
-        route = 'ΓXWLΓK|UX'
-    elif len(sys.argv) > 3:
-        print('Too many args')
-        return
+    if len(sys.argv) == 2:  # DIRTY HACKS! THIS "DEFAULT VALUE" SHOULD NOT BE!
+        sys.argv.append('FCC')
+        sys.argv.append('ΓXWLΓK|UX')
+    if (cell := sys.argv[2].upper()) not in (pC := set(NAME_TO_CRYSTAL_KVEC)):
+        print(f'{cell} is not a known cell\n\tTry one of {pC}')
+    if len(sys.argv) == 3:
+        # take the default route through the cell
+        route = getRecommendedRoute(cell)
     else:
-        # first try in interpret input as the name of a cell
-        if not (route := getRecommendedRoute(sys.argv[2].upper())):
-            # route must actually be a list of critical points
-            route = sys.argv[2].upper().replace('G', 'Γ')
-            if len(route) <= 2:
-                print('Please supply two or more labels from '
-                      f'{set(NAME_TO_CRYSTAL_KVEC)}')
-                return
-            wrong = set(route) - (set(NAME_TO_CRYSTAL_KVEC) | set('|'))
-            if wrong:
-                if len(wrong) == 1:
-                    print(f'{str(wrong)[1:-1]} is not a valid point label.')
-                else:
-                    print(f'{str(wrong)[1:-1]} are not valid point labels.')
-                print(f'Try some of {set(NAME_TO_CRYSTAL_KVEC)} instead.')
-                return
+        # clean the list of given critical points (excessivly complicated)
+        route = sys.argv[3].upper().replace('G', 'Γ')
+        Pkpts = set(NAME_TO_CRYSTAL_KVEC[cell])
+        if len(route) <= 2:
+            print('Please supply two or more labels from '
+                  f'{Pkpts}')
+            return
+        wrong = set(route) - (Pkpts | set('|'))
+        if wrong:
+            if len(wrong) == 1:
+                print(f'{str(wrong)[1:-1]} is not a valid point label.')
+            else:
+                print(f'{str(wrong)[1:-1]} are not valid point labels.')
+            print(f'Try some of {Pkpts} instead.')
+            return
 
-    print(printKpoints(NPts, route).replace('Γ', 'G'))
+    print(printKpoints(NPts, cell, route).replace('Γ', 'G'))
 
 
-def kpoints(NPts, route):
+def kpoints(NPts, cell, route):
     # or use 'crystal_b', and change α = NAME_TO_CRYSTAL_KVEC[a][0]
     route += '|'  # if route[-1] != '|'   # ensure last character is a |
     path = []
@@ -55,8 +56,9 @@ def kpoints(NPts, route):
     for a, b in zip(route, route[1:]):
         if a == '|':
             continue
-        d = np.linalg.norm(kvecFromName(a)-kvecFromName(b)) if b != '|' else 0
-        path.append([a, kvecFromName(a), d])
+        d = (np.linalg.norm(kvecFromName(a, cell)-kvecFromName(b, cell))
+             if b != '|' else 0)
+        path.append([a, kvecFromName(a, cell), d])
         weight += d
     weight = NPts/weight
     for p in path:
@@ -64,14 +66,14 @@ def kpoints(NPts, route):
     return path
 
 
-def printKpoints(NPts, route):
-    path = kpoints(NPts, route)
+def printKpoints(NPts, cell, route):
+    path = kpoints(NPts, cell, route)
     output = ''
     actualNPts = 0
     for n, α, w in path:
         output += f'{α[0]:.3f} {α[1]:.3f} {α[2]:.3f} {w: 4d}  ! {n}\n'
         actualNPts += w
-    output = (f'K_POINTS tpiba_b  ! {route}\n'
+    output = (f'K_POINTS tpiba_b  ! {cell} {route}\n'
               + f'{len(path)}  ! total points = {actualNPts}\n' + output)
     return output
 
@@ -102,35 +104,35 @@ def getAllPermutations(vec):
     return vecs
 
 
-def kvecFromName(s, BLat='FCC'):
+def kvecFromName(s, BLat):
     if (BZ := NAME_TO_CRYSTAL_KVEC.get(BLat)) and (P := BZ.get(s.upper())):
         return P['kvec']
 
 
-def crystalFromName(s, BLat='FCC'):
+def crystalFromName(s, BLat):
     if (BZ := NAME_TO_CRYSTAL_KVEC.get(BLat)) and (P := BZ.get(s.upper())):
         return P['crystal']
 
 
-def kvecFromCrystal(k, BLat='FCC'):
+def kvecFromCrystal(k, BLat):
     if ((BZ := CRYSTAL_TO_NAME_KVEC.get(BLat))
             and (P := BZ.get(tuple(np.sort(np.abs(k)))))):  # (((sufficiency)))
         return P['kvec']
 
 
-def crystalFromKvec(c, BLat='FCC'):
+def crystalFromKvec(c, BLat):
     if ((BZ := KVEC_TO_NAME_CRYSTAL.get(BLat))
             and (P := BZ.get(tuple(np.sort(np.abs(c)))))):
         return P['crystal']
 
 
-def nameFromCrystal(k, BLat='FCC'):
+def nameFromCrystal(k, BLat):
     if ((BZ := CRYSTAL_TO_NAME_KVEC.get(BLat))
             and (P := BZ.get(tuple(np.sort(np.abs(k)))))):
         return P['name']
 
 
-def nameFromKvec(c, BLat='FCC'):
+def nameFromKvec(c, BLat):
     if ((BZ := KVEC_TO_NAME_CRYSTAL.get(BLat))
             and (P := BZ.get(tuple(np.sort(np.abs(c)))))):
         return P['name']

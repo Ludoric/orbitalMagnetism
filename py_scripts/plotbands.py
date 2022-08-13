@@ -71,11 +71,11 @@ def loadLotsOfData(bandFName, zeroFN=None, zeroN='FermiE', orbital='Gd4f'):
             print('Spin not known from file name, defaulting to ↑')
             spin = '↑'
         fparts = re.split('/|_', fstr)
-        # HU = float(fparts[fparts.index(orbital)+1])
-        s = fparts[2][4:8]
-        if s[-1] == '-':
-            s = s[:-1]
-        HU = float(s)
+        HU = float(fparts[fparts.index(orbital)+1])
+        # s = fparts[2][4:8]
+        # if s[-1] == '-':
+        #     s = s[:-1]
+        # HU = float(s)
 
         if zeroFN is None:
             bandD.setdefault(HU, {})[spin] = readBandFile(file)
@@ -144,7 +144,7 @@ def plotDOS(datdos, ax=None, onY=False):
     return f, ax
 
 
-def plotBands(datup, datdw=None, ax=None, nolegend=False):
+def plotBands(cell, datup, datdw=None, ax=None, nolegend=False):
     if ax:
         f = None
     else:
@@ -165,9 +165,9 @@ def plotBands(datup, datdw=None, ax=None, nolegend=False):
     kpoints_x = []
     kpoints_n = []
     for h, l in zip(horiz, datup[:, :3]):
-        if kpoint := kp.nameFromKvec(l):
+        if kpoint := kp.nameFromKvec(l, cell):
             kpoints_x.append(h)
-            kpoints_n.append('Γ' if kpoint == 'Gamma' else kpoint)
+            kpoints_n.append(kpoint)
     ax.set_xticks(kpoints_x)
     ax.set_xticklabels(kpoints_n)
     ax.grid(axis='x', color='k', linewidth=1, linestyle='-')
@@ -182,7 +182,7 @@ def plotBands(datup, datdw=None, ax=None, nolegend=False):
     return f, ax
 
 
-def plotKvsHU(bandD, kpoint='Gamma', orbital='Gd4f', individual=False,
+def plotKvsHU(bandD, cell, kpoint='Gamma', orbital='Gd4f', individual=False,
               ax=None):
     # kindex = [kp.nameFromKvec(r) for r in (bandD.values(), )[0]['↑'][:, :3]
     #           ].index(kpoint)
@@ -192,7 +192,7 @@ def plotKvsHU(bandD, kpoint='Gamma', orbital='Gd4f', individual=False,
     Sup, Sdw, Hs = [], [], []
     for HU, S in sorted(bandD.items()):
         if individual:
-            plotBands(S['↑'], S.get('↓'))
+            plotBands(cell, S['↑'], S.get('↓'))
         Sup.append(S['↑'][kindex, 3:])
         Sdw.append(S['↓'][kindex, 3:])
         Hs.append(HU)
@@ -201,9 +201,7 @@ def plotKvsHU(bandD, kpoint='Gamma', orbital='Gd4f', individual=False,
     arginds = Hs.argsort()
     Sup, Sdw, Hs = Sup[arginds], Sdw[arginds], Hs[arginds]
 
-    if ax:
-        f = None
-    else:
+    if not ax:
         f = plt.figure()
         f.tight_layout()
         ax = f.add_subplot()
@@ -217,14 +215,42 @@ def plotKvsHU(bandD, kpoint='Gamma', orbital='Gd4f', individual=False,
     return f, ax
 
 
-def plotBandsDos(dosFN, bandSupFN, bandSdwFN):
+def plotBandgap(bandD, orbital='Gd4f', ax=None):
+    Sup, Sdw, Hs = [], [], []
+    for HU, S in sorted(bandD.items()):
+        vup = S['↑'][:, 3:]
+        vdw = S['↓'][:, 3:]
+        sup = vup[vup > 0].min() - vup[vup < 0].max()
+        sdw = vdw[vdw > 0].min() - vdw[vdw < 0].max()
+        Sup.append(sup)
+        Sdw.append(sdw)
+        Hs.append(HU)
+    # sort all three arrays by the Hubbard U parameter
+    Sup, Sdw, Hs = np.array(Sup), np.array(Sdw), np.array(Hs)
+    arginds = Hs.argsort()
+    Sup, Sdw, Hs = Sup[arginds], Sdw[arginds], Hs[arginds]
+
+    if not ax:
+        f = plt.figure()
+        f.tight_layout()
+        ax = f.add_subplot()
+    ax.plot(Hs, Sup, '-r', zorder=1, label='Majority Spin (↑)')
+    ax.plot(Hs, Sdw, ':b', zorder=2, label='Minority Spin (↓)')
+    # ax.set_ylim(-10, 10)
+    ax.set_ylabel('Energy [eV]')
+    ax.set_xlabel(f'Hubbard U for {orbital} [eV]')
+    ax.margins(x=0)
+    return f, ax
+
+
+def plotBandsDos(cell, dosFN, bandSupFN, bandSdwFN):
     FermiE, datdos = readDOS(dosFN)
     dup = readBandFile(bandSupFN, zeroPoint=FermiE)
     ddown = readBandFile(bandSdwFN, zeroPoint=FermiE)
     f, (ax1, ax2) = plt.subplots(
         ncols=2, sharey=True, figsize=(12, 6),
         gridspec_kw={'width_ratios': [3, 1]})
-    plotBands(dup, ddown, ax=ax1, nolegend=True)
+    plotBands(cell, dup, ddown, ax=ax1, nolegend=True)
     plotDOS(datdos, ax=ax2, onY=True)
     ax2.set_ylabel(None)
     f.tight_layout()
@@ -247,12 +273,13 @@ if __name__ == '__main__':
     # plotBandsDos('../tooBig/hubbardOut/H_Gd4f_8.00_GdN-FCC.dos',
     #              '../tooBig/hubbardOut/H_Gd4f_8.00_GdN-FCC-S1.bands',
     #              '../tooBig/hubbardOut/H_Gd4f_8.00_GdN-FCC-S2.bands')
-    bandD = loadLotsOfData('./',
-                           './fermi.tsv',
-                           orbital='Gd4f')
-    plotKvsHU(bandD, kpoint='Γ', individual=True, orbital='Gd4f')
+    # bandD = loadLotsOfData('./',
+    #                        './fermi.tsv',
+    #                        orbital='Gd-5d')
+    # plotKvsHU(bandD, kpoint='X', individual=False, orbital='Gd-5d')
+    # plotBandgap(bandD, orbital='Gd-5d')
 
-    # dup = readBandFile('test70_U2_S1.band', zeroPoint=14.9240)
-    # ddown = readBandFile('test70_U2_S2.band', zeroPoint=14.9240)
-    # plotBands(dup, ddown)
+    dup = readBandFile('GdN-HB2-v70_Gd-5d_6.6_-S1.bands', zeroPoint=0)
+    ddown = readBandFile('GdN-HB2-v70_Gd-5d_6.6_-S2.bands', zeroPoint=0)
+    plotBands('FCC', dup, ddown)
     plt.show()

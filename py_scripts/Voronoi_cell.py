@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import sys
 import numpy as np
 import plotly.graph_objects as go
 from scipy.spatial import Voronoi
@@ -6,9 +7,18 @@ import bandplot_kpoints as KPts
 
 
 def main():
+    if len(sys.argv) == 1:
+        # print something
+        lattn = 'FCC'
+    if len(sys.argv) == 2:
+        lattn = sys.argv[1]
+
     # 'lattice_vectors' defines the unit cell of a primitive lattice
-    # remember that a real space fcc lattice is a reciprocal space bcc lattice!
-    lattice_vectors = EXAMPLE_LATTICES['BCC']
+    lattice_vectors = EXAMPLE_LATTICES[lattn]
+
+    # HCP_REAL = np.array([0.5*np.array([1, np.sqrt(3), 0]),
+    #                      0.5*np.array([1, -np.sqrt(3), 0]),
+    #                      1.0*np.array([0, 0, np.sqrt(8/3)])]),
 
     # the basis for hcp crystal lattice
     # basis = [np.array([1/3, 2/3, 1/4]), np.array([2/3, 1/3, 3/4])]
@@ -22,7 +32,7 @@ def main():
     addLatticePointsToPlot(fig, voronoi)
     addPrimitiveCellToPlot(fig, lattice_vectors)
     addVoronoiCellToPlot(fig, voronoi)
-    plotCriticalPoints(fig, 'FCC')
+    plotCriticalPoints(fig, lattn)
 
     fig.update_layout(scene=dict(
         xaxis=dict(showticklabels=False, showgrid=False, showbackground=True),
@@ -36,20 +46,16 @@ EXAMPLE_LATTICES = {
     'CUB': np.array([np.array([1, 0, 0]),
                     np.array([0, 1, 0]),
                     np.array([0, 0, 1])]),
-    'BCC': np.array([np.array([-1, 1, 1]),
+    'FCC': np.array([np.array([-1, 1, 1]),
                      np.array([1, -1, 1]),
                      np.array([1, 1, -1])]),
-    'FCC': np.array([np.array([0, 1, 1]),
+    'BCC': np.array([np.array([0, 1, 1]),
                      np.array([1, 0, 1]),
                      np.array([1, 1, 0])]),
-    'HCP': {
-        'real': np.array([0.5*np.array([1, np.sqrt(3), 0]),
-                          0.5*np.array([1, -np.sqrt(3), 0]),
-                          1.0*np.array([0, 0, np.sqrt(8/3)])]),
-        'reciprocal': np.array([np.array([-1, -1/np.sqrt(3), 0]),
-                                np.array([-1, 1/np.sqrt(3), 0]),
-                                np.array([0, 0, -np.sqrt(6)/4])])
-    }
+    'HEX': np.array([np.array([-1, -1/np.sqrt(3), 0]),
+                     np.array([-1, 1/np.sqrt(3), 0]),
+                     np.array([0, 0, -np.sqrt(6)/4])])
+
 }
 
 
