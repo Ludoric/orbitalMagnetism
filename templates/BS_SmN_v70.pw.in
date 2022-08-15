@@ -1,0 +1,49 @@
+&CONTROL
+  calculation = '%calculation%'
+  title = '%title%'
+  verbosity = 'high'
+  restart_mode = 'from_scratch'
+  etot_conv_thr =   8.0000000000d-05
+  forc_conv_thr =   1.0000000000d-04
+  outdir = '%outdir%'
+  prefix = '%prefix%'
+  pseudo_dir = '%pseudo_dir%'
+  disk_io = 'low'
+  tprnfor = .true.
+  tstress = .true.
+/
+&SYSTEM
+  degauss =   1.4699723600d-02
+  ecutrho =   %ecutrho%
+  ecutwfc =   %ecutwfc%
+  ibrav = 2
+  A = 4.999
+  nat = 2
+  nosym = .%nosym%.
+  nspin = 2
+  ntyp = 2
+  nbnd = %nbnd% ! num Kohn-Sham states
+  occupations = '%occupations%'
+  starting_magnetization(1) =   1.0
+  starting_magnetization(2) =   0.0
+  lda_plus_u=.true.
+  lda_plus_u_kind=0
+  Hubbard_U(1) = %HU%
+  Hubbard_U_back(1) = %HU_back%
+/
+&ELECTRONS
+  conv_thr =   1.6000000000d-09
+  electron_maxstep = 80
+  mixing_beta =   4.0000000000d-01
+/
+&IONS
+/
+&CELL
+/
+ATOMIC_SPECIES
+Sm     150.36 Sm.GGA-PBE-paw-v1.0.UPF
+N      14.0067 N.pbe-kjpaw.UPF
+ATOMIC_POSITIONS (crystal)
+Sm           0.0000000000       0.0000000000       0.0000000000
+N            0.5000000000       0.5000000000       0.5000000000
+! kpoints and hubbard appended separately

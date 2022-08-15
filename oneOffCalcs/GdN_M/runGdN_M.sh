@@ -1,20 +1,19 @@
 #!/bin/bash
 #SBATCH --job-name=GdN_M
-#SBATCH --time=00-12:00:00
+#SBATCH --time=00-02:00:00
 #SBATCH --output=/nfs/scratch/trewicedwa/GdN_M/log_GdN_M.out
 #SBATCH --error=/nfs/scratch/trewicedwa/GdN_M/log_GdN_M.err
-#SBATCH --partition=parallel
+#SBATCH --partition=quicktest
 #SBATCH --ntasks=64
 #SBATCH --cpus-per-task=1
-#SBATCH --tasks-per-node=32
+#SBATCH --tasks-per-node=64
 #SBATCH --mem-per-cpu=1G
-#SBATCH --nodes=2
-#SBATCH --constraint="AMD"
+#SBATCH --nodes=1
 
-mkdir '/nfs/scratch/trewicedwa/GdN_M/'
-mkdir '/nfs/scratch/trewicedwa/GdN_M/out'
-cd '/nfs/scratch/trewicedwa/GdN_M/'
-cp '/nfs/home/trewicedwa/orbitalMagnetism/oneOffCalcs/GdN_M/*' ./
+# mkdir "/nfs/scratch/trewicedwa/GdN_M/"
+# mkdir "/nfs/scratch/trewicedwa/GdN_M/out"
+cd "/nfs/scratch/trewicedwa/GdN_M/"
+cp /nfs/home/trewicedwa/orbitalMagnetism/oneOffCalcs/GdN_M/* ./
 
 BINLOC="/nfs/home/trewicedwa/qe-7.0/bin"
 
@@ -22,20 +21,24 @@ module load intel/2021b
 
 
 
-# Run pw to obtain the ground state
-mpirun -np 64 '$BINLOC/pw.x' -npool 4 -in Gd_M_vc-relax.pw.in > Gd_M_vc-relax.pw.out
-# Run pw to obtain the Bloch states on a uniform k-point grid
-mpirun -np 64 '$BINLOC/pw.x' -npool 4 -in Gd_M_nscf.pw.in > Gd_M_nscf.pw.out
-# Run wannier90 to generate a list of the required overlaps (written into the Fe.nnkp file).
-mpirun -np 64 '$BINLOC/wannier90.x -pp GdN_M' -npool 4
-# Run pw2wannier90 to compute:
-# – The overlaps <h_{unk}|u_{mk+bi}> (written in the Fe.mmn file)
-# – The projections for the starting guess (written in the Fe.amn file)
-# – The matrix elements <h_{unk+b1}|H_k|u_{mk+b2i}> (written in the Fe.uHu file)
-$BINLOC/pw2wannier90.x < GdN_M.pw2wan.in > GdN_M.pw2wan.out
-# mpirun -np 64 pw2wannier90.x -npool 4 -in Fe.pw2wan > pw2wan.out
-# Run wannier90 to compute the MLWFs.
-mpirun -np 64 'wannier90.x GdN_M' -npool 4
+# # Run pw to obtain the ground state
+# mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in GdN_vc-relax.pw.in | tee GdN_vc-relax.pw.out
+# # Run pw to obtain the Bloch states on a uniform k-point grid
+# # !!! use the lattice output from vc-relax as input to scf and wannier90
+# mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in GdN_M_scf.pw.in | tee GdN_M_scf.pw.out
+# mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in GdN_M_nscf.pw.in | tee GdN_M_nscf.pw.out
+# # Run wannier90 to generate a list of the required overlaps (written into the Fe.nnkp file).
+# # !!!! mpi not available for wannier90.x
+# $BINLOC/wannier90.x -pp GdN_M | tee GdN_M_1.wannier90.out
+# # Run pw2wannier90 to compute:
+# # – The overlaps <h_{unk}|u_{mk+bi}> (written in the Fe.mmn file)
+# # – The projections for the starting guess (written in the Fe.amn file)
+# # – The matrix elements <h_{unk+b1}|H_k|u_{mk+b2i}> (written in the Fe.uHu file)
+# # !!!! pools not implemented for pw2wannier90.x
+# # !!!! there may not be more processors than bands created in GdN_M.win
+# mpirun -np 50 "$BINLOC/pw2wannier90.x" -in GdN_M.pw2wan.in | tee GdN_M.pw2wan.out
+# # Run wannier90 to compute the MLWFs.
+# # !!!! mpi not available for wannier90.x
+# $BINLOC/wannier90.x GdN_M | tee GdN_M_2.wannier90.out
 # # Run postw90 to compute the orbital magnetization.
-# # postw90.x Fe # (serial execution)
-mpirun -np 64 'postw90.x GdN_M' -npool 4
+# mpirun -np 64 $BINLOC/postw90.x GdN_M | tee GdN_M_1.postw90.out

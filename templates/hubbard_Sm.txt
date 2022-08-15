@@ -1,0 +1,3 @@
+HUBBARD (atomic)
+U Sm-4f %Sm-4f%
+U Sm-5d %Sm-5d%

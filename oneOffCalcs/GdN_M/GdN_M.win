@@ -1,11 +1,10 @@
-num_bands         =   32
-num_wann          =   26
-# 23 named bands + 3 = 26 total
+num_bands         =  25
+num_wann          =  25
 
-dis_win_min       = -3.0d0
-dis_win_max       = 70.0d0
-dis_froz_min      = 10.0d0
-dis_froz_max      =  21.0d0
+dis_win_min       = -5.0d0
+dis_win_max       = 40.0d0
+dis_froz_min      = 0.0d0
+dis_froz_max      =  40.0d0
 dis_num_iter      =  500
 
 num_iter          = 200
@@ -13,10 +12,9 @@ dis_mix_ratio = 1.0
 
 spinors = true
 begin projections
-Fe: fz3;fz(x2-y2);fx(x2-3y2);fy(3x2-y2);fxz2;fyz2;fxyz(u)
-Fe: dxy;dxz;dyz;dx2-y2;dz2
+Gd: s;p;d;f  # fz3;fz(x2-y2);fx(x2-3y2);fy(3x2-y2);fxz2;fyz2;fxyz
+Gd: sp3d
 N: px;py;pz
-random
 end projections
 
 #fermi_energy = 13.9717
@@ -44,12 +42,11 @@ end kpoint_path
 #kslice_b1 =     0.5 -0.5 -0.5
 #kslice_b2 =     0.5  0.5  0.5
 
-# THESE VALUES ARE WRONG, CORRECT THEM
 begin unit_cell_cart
-bohr
--4.889578770762466e0 1.141545828000585e-16 4.889578770762466e0
--1.148156351061760e-16 4.889578770762466e0 4.889578770762466e0
--4.889578770762466e0 4.889578770762466e0 9.746977530644685e-17
+Ang
+2.5874537 2.5874537 0.0000000
+2.5874537 0.0000000 2.5874537
+0.0000000 2.5874537 2.5874537
 end unit_cell_cart
 
 begin atoms_frac
