@@ -11,6 +11,7 @@
 #SBATCH --nodes=2
 #SBATCH --constraint="AMD"
 
+BINLOC="/nfs/home/trewicedwa/qe-7.0/bin"
 # SRC=$(dirname $(dirname $(realpath ${BASH_SOURCE})))
 SRC="/nfs/home/trewicedwa/orbitalMagnetism"
 SCRATCH="/nfs/scratch2/trewicedwa/SmN_H1"
