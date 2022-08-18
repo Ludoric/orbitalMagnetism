@@ -21,15 +21,15 @@ module load intel/2021b
 
 
 
-# # Run pw to obtain the ground state
-# # mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in GdN_vc-relax.pw.in | tee GdN_vc-relax.pw.out
-# # Run pw to obtain the Bloch states on a uniform k-point grid
-# # !!! use the lattice output from vc-relax as input to scf and wannier90
+# Run pw to obtain the ground state
+# mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in GdN_vc-relax.pw.in | tee GdN_vc-relax.pw.out
+# Run pw to obtain the Bloch states on a uniform k-point grid
+# !!! use the lattice output from vc-relax as input to scf and wannier90
 # mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in GdN_M_scf.pw.in | tee GdN_M_scf.pw.out
-# mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in GdN_M_nscf.pw.in | tee GdN_M_nscf.pw.out
-# # Run wannier90 to generate a list of the required overlaps (written into the Fe.nnkp file).
-# # !!!! mpi not available for wannier90.x
-# $BINLOC/wannier90.x -pp GdN_M | tee GdN_M_1.wannier90.out
+mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in GdN_M_nscf.pw.in | tee GdN_M_nscf.pw.out
+# Run wannier90 to generate a list of the required overlaps (written into the Fe.nnkp file).
+# !!!! mpi not available for wannier90.x
+$BINLOC/wannier90.x -pp GdN_M | tee GdN_M_1.wannier90.out
 # Run pw2wannier90 to compute:
 # – The overlaps <h_{unk}|u_{mk+bi}> (written in the Fe.mmn file)
 # – The projections for the starting guess (written in the Fe.amn file)
