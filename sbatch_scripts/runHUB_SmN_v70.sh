@@ -42,7 +42,7 @@ R_CALCULATION='vc-relax'
 R_K_FILE="${SRC}/templates/relax_k_BS.txt"
 R_K=14
 OCCUPATIONS='smearing'
-NOSYM='false'
+NOSYM='true'
 NBND=25
 
 B_CALCULATION='bands'
@@ -52,7 +52,7 @@ D_CALCULATION='nscf'
 D_K_FILE="${SRC}/templates/relax_k_BS.txt"
 D_K=17
 D_OCCUPATIONS='tetrahedra'
-D_NOSYM='false'
+D_NOSYM='true'
 
 
 

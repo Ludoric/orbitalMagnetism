@@ -284,3 +284,8 @@ if __name__ == '__main__':
     # ddown = readBandFile('GdN-HB2-v70_Gd-5d_6.6_-S2.bands', zeroPoint=0)
     # plotBands('FCC', dup, ddown)
     plt.show()
+
+    # SmN - Paramagnetic phase 1.3ev from fermi measured from (5d-sup 5d-sdw)
+
+
+# keep trying to get wannier to work!!!!
