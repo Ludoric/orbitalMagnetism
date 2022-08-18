@@ -10,11 +10,11 @@ dis_num_iter      =  500
 num_iter          = 200
 dis_mix_ratio = 1.0
 
-spinors = true
+# spinors = true
 begin projections
 Gd: s;p;d;f  # fz3;fz(x2-y2);fx(x2-3y2);fy(3x2-y2);fxz2;fyz2;fxyz
 Gd: sp3d
-N: px;py;pz
+N: px;py;pz;s
 end projections
 
 #fermi_energy = 13.9717
