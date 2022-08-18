@@ -29,16 +29,20 @@ module load intel/2021b
 mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in GdN_M_nscf.pw.in | tee GdN_M_nscf.pw.out
 # Run wannier90 to generate a list of the required overlaps (written into the Fe.nnkp file).
 # !!!! mpi not available for wannier90.x
-$BINLOC/wannier90.x -pp GdN_M | tee GdN_M_1.wannier90.out
+$BINLOC/wannier90.x -pp GdN_M_up | tee GdN_M_dw_1.wannier90.out
+$BINLOC/wannier90.x -pp GdN_M_dw | tee GdN_M_dw_1.wannier90.out
 # Run pw2wannier90 to compute:
 # – The overlaps <h_{unk}|u_{mk+bi}> (written in the Fe.mmn file)
 # – The projections for the starting guess (written in the Fe.amn file)
 # – The matrix elements <h_{unk+b1}|H_k|u_{mk+b2i}> (written in the Fe.uHu file)
 # !!!! pools not implemented for pw2wannier90.x
 # !!!! there may not be more processors than bands created in GdN_M.win
-mpirun -np 25 "$BINLOC/pw2wannier90.x" -in GdN_M.pw2wan.in | tee GdN_M.pw2wan.out
+mpirun -np 25 "$BINLOC/pw2wannier90.x" -in GdN_M_up.pw2wan.in | tee GdN_M_up.pw2wan.out
+mpirun -np 25 "$BINLOC/pw2wannier90.x" -in GdN_M_dw.pw2wan.in | tee GdN_M_dw.pw2wan.out
 # Run wannier90 to compute the MLWFs.
 # !!!! mpi not available for wannier90.x
-$BINLOC/wannier90.x GdN_M | tee GdN_M_2.wannier90.out
+$BINLOC/wannier90.x GdN_M_up | tee GdN_M_up_2.wannier90.out
+$BINLOC/wannier90.x GdN_M_dw | tee GdN_M_dw_2.wannier90.out
 # Run postw90 to compute the orbital magnetization.
-mpirun -np 64 $BINLOC/postw90.x GdN_M | tee GdN_M_1.postw90.out
+mpirun -np 64 $BINLOC/postw90.x GdN_M_up | tee GdN_M_up_1.postw90.out
+mpirun -np 64 $BINLOC/postw90.x GdN_M_dw | tee GdN_M_dw_1.postw90.out
