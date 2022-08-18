@@ -187,7 +187,7 @@ def plotKvsHU(bandD, cell, kpoint='Gamma', orbital='Gd4f', individual=False,
     # kindex = [kp.nameFromKvec(r) for r in (bandD.values(), )[0]['↑'][:, :3]
     #           ].index(kpoint)
     for kindex, r in enumerate(tuple(bandD.values())[0]['↑'][:, :3]):
-        if kp.nameFromKvec(r) == kpoint:
+        if kp.nameFromKvec(r, cell) == kpoint:
             break
     Sup, Sdw, Hs = [], [], []
     for HU, S in sorted(bandD.items()):
@@ -196,10 +196,11 @@ def plotKvsHU(bandD, cell, kpoint='Gamma', orbital='Gd4f', individual=False,
         Sup.append(S['↑'][kindex, 3:])
         Sdw.append(S['↓'][kindex, 3:])
         Hs.append(HU)
-    # sort all three arrays by the Hubbard U parameter
     Sup, Sdw, Hs = np.array(Sup), np.array(Sdw), np.array(Hs)
-    arginds = Hs.argsort()
-    Sup, Sdw, Hs = Sup[arginds], Sdw[arginds], Hs[arginds]
+    # # sort all three arrays by the Hubbard U parameter
+    # arginds = Hs.argsort()
+    # Sup, Sdw, Hs = Sup[arginds], Sdw[arginds], Hs[arginds]
+    # (already sorted by calling sorted(bandD.items()))
 
     if not ax:
         f = plt.figure()
@@ -225,10 +226,11 @@ def plotBandgap(bandD, orbital='Gd4f', ax=None):
         Sup.append(sup)
         Sdw.append(sdw)
         Hs.append(HU)
-    # sort all three arrays by the Hubbard U parameter
     Sup, Sdw, Hs = np.array(Sup), np.array(Sdw), np.array(Hs)
-    arginds = Hs.argsort()
-    Sup, Sdw, Hs = Sup[arginds], Sdw[arginds], Hs[arginds]
+    # # sort all three arrays by the Hubbard U parameter
+    # arginds = Hs.argsort()
+    # Sup, Sdw, Hs = Sup[arginds], Sdw[arginds], Hs[arginds]
+    # (already sorted by calling sorted(bandD.items()))
 
     if not ax:
         f = plt.figure()
@@ -265,9 +267,8 @@ if __name__ == '__main__':
     # dup = readBandFile('bands-up_GdN-FCC.bands')
     # ddown = readBandFile('bands-down_GdN-FCC.bands')
     # plotBands(dup, ddown)
-    # bandD = loadLotsOfData('../tooBig/hubbardOut/',
-    #                        '../tooBig/hubbardOut/fermi.tsv')
-    # plotKvsHU(bandD, kpoint='Gamma', individual=False)
+    bandD = loadLotsOfData('./', './fermi.tsv', orbital='Gd-4f')
+    plotKvsHU(bandD, 'FCC', kpoint='Gamma', individual=False, orbital='Gd-4f')
     # thus if the Gd4f band is 7.8eV below the fermi level, U should be 8.4eV
     # (from GdN THIN FILMS: BULK AND LOCAL ELECTRONIC...)
     # plotBandsDos('../tooBig/hubbardOut/H_Gd4f_8.00_GdN-FCC.dos',
@@ -279,7 +280,7 @@ if __name__ == '__main__':
     # plotKvsHU(bandD, kpoint='X', individual=False, orbital='Gd-5d')
     # plotBandgap(bandD, orbital='Gd-5d')
 
-    dup = readBandFile('GdN-HB2-v70_Gd-5d_6.6_-S1.bands', zeroPoint=0)
-    ddown = readBandFile('GdN-HB2-v70_Gd-5d_6.6_-S2.bands', zeroPoint=0)
-    plotBands('FCC', dup, ddown)
+    # dup = readBandFile('GdN-HB2-v70_Gd-5d_6.6_-S1.bands', zeroPoint=0)
+    # ddown = readBandFile('GdN-HB2-v70_Gd-5d_6.6_-S2.bands', zeroPoint=0)
+    # plotBands('FCC', dup, ddown)
     plt.show()
