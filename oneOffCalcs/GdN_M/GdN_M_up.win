@@ -17,7 +17,7 @@ Gd: sp3d
 N: px;py;pz;s
 end projections
 
-#fermi_energy = 13.9717
+fermi_energy = 13.9717
 
 iprint = 2
 
@@ -26,14 +26,25 @@ iprint = 2
 #berry_kmesh = 25 25 25
 
 kpath = true
-kpath_task = bands+morb
-kpath_num_points=600
+kpath_task = bands
+kpath_num_points=100
 begin kpoint_path
 G 0.000 0.000 0.000   X 0.000 1.000 0.000
 X 0.000 1.000 0.000   W 0.500 1.000 0.000
 W 0.500 1.000 0.000   K 0.750 0.750 0.000
+K 0.750 0.750 0.000   G 0.000 0.000 0.000
+G 0.000 0.000 0.000   L 0.500 0.500 0.500
+L 0.500 0.500 0.500   U 0.250 1.000 0.250
+U 0.250 1.000 0.250   W 0.500 1.000 0.000
+W 0.500 1.000 0.000   L 0.500 0.500 0.500
+L 0.500 0.500 0.500   K 0.750 0.750 0.000
+K 0.750 0.750 0.000   U 0.250 1.000 0.250
+U 0.250 1.000 0.250   X 0.000 1.000 0.000
 end kpoint_path
 
+boltz_calc_also_dos = true
+dos = true
+dos_kmesh = 21
 
 #kslice = true
 #kslice_task = morb+fermi_lines
@@ -45,8 +56,8 @@ end kpoint_path
 begin unit_cell_cart
 Ang
 2.5874537 2.5874537 0.0000000
-2.5874537 0.0000000 2.5874537
 0.0000000 2.5874537 2.5874537
+2.5874537 0.0000000 2.5874537
 end unit_cell_cart
 
 begin atoms_frac

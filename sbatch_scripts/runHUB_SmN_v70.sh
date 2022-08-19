@@ -23,7 +23,7 @@ DO_PW_DOS=false
 DO_DOS=false
 
 # set this to true, or nothing will happen when you run it for real
-DO_COMPUTE_ANYTHING=false
+DO_COMPUTE_ANYTHING=true
 
 
 PWTEMPLATE="${SRC}/templates/BS_SmN_v70.pw.in"

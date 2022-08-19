@@ -2,7 +2,7 @@
    outdir = '/nfs/scratch2/trewicedwa/GdN_M/out/'
    prefix = 'GdN_M'
    seedname = 'GdN_M_dw'
-   spin_component = 'dw'
+   spin_component = 'down'
    write_mmn = .true.
    write_amn = .true.
    write_uHu = .false.
