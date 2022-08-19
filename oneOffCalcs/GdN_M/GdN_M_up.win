@@ -42,9 +42,9 @@ K 0.750 0.750 0.000   U 0.250 1.000 0.250
 U 0.250 1.000 0.250   X 0.000 1.000 0.000
 end kpoint_path
 
-boltz_calc_also_dos = true
-dos = true
-dos_kmesh = 21
+# boltz_calc_also_dos = true
+# dos = true
+# dos_kmesh = 21
 
 #kslice = true
 #kslice_task = morb+fermi_lines
