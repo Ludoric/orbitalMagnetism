@@ -36,7 +36,7 @@ PREPREFIX='SmN-H1'
 HUBBARD_FILE="${SRC}/templates/hubbard_Sm.txt"
 ECUTRHO=320
 ECUTWFC=80
-HU_GD_5D=1e-4
+HU_SM_5D=1e-4
 
 R_CALCULATION='vc-relax'
 R_K_FILE="${SRC}/templates/relax_k_BS.txt"
@@ -67,11 +67,11 @@ if [ "$DO_COMPUTE_ANYTHING" = true ]; then
     module load intel/2021b
 fi
 
-for HU_GD_4F in $(seq 5.0 0.4 12.0); do
+for HU_SM_4F in $(seq 0.5 0.5 6.0); do
     # The value for prefix must reflect the values looped through
-    PREFIX="${PREPREFIX}_Gd-4f_${HU_GD_4F}_"
+    PREFIX="${PREPREFIX}_Sm-4f_${HU_SM_4F}_"
     TITLE=$PREFIX
-    echo -e "Gd-4F: ${HU_GD_4F}" # NEW CELL
+    echo -e "Sm-4F: ${HU_SM_4F}" # NEW CELL
 
     if [ "$DO_PW_RELAX" = true ]; then
         START=$(date +%s.%N)
@@ -82,7 +82,7 @@ for HU_GD_4F in $(seq 5.0 0.4 12.0); do
             -e "s/%ecutrho%/${ECUTRHO}/g; s/%ecutwfc%/${ECUTWFC}/g;" \
             -e "s/%nbnd%/${NBND}/g; s/%calculation%/${R_CALCULATION}/g;" \
             -e "s/%occupations%/${OCCUPATIONS}/g; s/%nosym%/${NOSYM}/g;" \
-            -e "s/%HU%/${HU_GD_4F}/g; s/%HU_back%/${HU_GD_5D}/g;" \
+            -e "s/%HU%/${HU_SM_4F}/g; s/%HU_back%/${HU_SM_5D}/g;" \
             $PWTEMPLATE > $RPWIOPUT'.in'
 
         sed -e "s/%k%/${R_K}/g" $R_K_FILE >> $RPWIOPUT'.in'
@@ -103,7 +103,7 @@ for HU_GD_4F in $(seq 5.0 0.4 12.0); do
             -e "s/%ecutrho%/${ECUTRHO}/g; s/%ecutwfc%/${ECUTWFC}/g;" \
             -e "s/%nbnd%/${NBND}/g; s/%calculation%/${B_CALCULATION}/g;" \
             -e "s/%occupations%/${OCCUPATIONS}/g; s/%nosym%/${NOSYM}/g;" \
-            -e "s/%HU%/${HU_GD_4F}/g; s/%HU_back%/${HU_GD_5D}/g;" \
+            -e "s/%HU%/${HU_SM_4F}/g; s/%HU_back%/${HU_SM_5D}/g;" \
             $PWTEMPLATE > $BPWIOPUT'.in'
 
         cat $B_K_FILE >> $BPWIOPUT'.in'
@@ -147,7 +147,7 @@ for HU_GD_4F in $(seq 5.0 0.4 12.0); do
             -e "s/%ecutrho%/${ECUTRHO}/g; s/%ecutwfc%/${ECUTWFC}/g;" \
             -e "s/%nbnd%/${NBND}/g; s/%calculation%/${D_CALCULATION}/g;" \
             -e "s/%occupations%/${D_OCCUPATIONS}/g; s/%nosym%/${D_NOSYM}/g;" \
-            -e "s/%HU%/${HU_GD_4F}/g; s/%HU_back%/${HU_GD_5D}/g;" \
+            -e "s/%HU%/${HU_SM_4F}/g; s/%HU_back%/${HU_SM_5D}/g;" \
             $PWTEMPLATE > $DPWIOPUT'.in'
 
         sed -e "s/%k%/${D_K}/g" $D_K_FILE >> $DPWIOPUT'.in'

@@ -280,8 +280,8 @@ if __name__ == '__main__':
     # plotKvsHU(bandD, kpoint='X', individual=False, orbital='Gd-5d')
     # plotBandgap(bandD, orbital='Gd-5d')
 
-    # dup = readBandFile('GdN-HB2-v70_Gd-5d_6.6_-S1.bands', zeroPoint=0)
-    # ddown = readBandFile('GdN-HB2-v70_Gd-5d_6.6_-S2.bands', zeroPoint=0)
+    # dup = readBandFile('SmN-H1_Gd-4f_5.0_-S1.bands', zeroPoint=0)
+    # ddown = readBandFile('SmN-H1_Gd-4f_5.0_-S2.bands', zeroPoint=0)
     # plotBands('FCC', dup, ddown)
     plt.show()
 
