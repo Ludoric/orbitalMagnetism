@@ -26,7 +26,7 @@ DO_DOS=false
 DO_COMPUTE_ANYTHING=true
 
 
-PWTEMPLATE="${SRC}/templates/BS_SmN_v70.pw.in"
+PWTEMPLATE="${SRC}/templates/BS_SmN_ORF_v70.pw.in"
 BANDSTEMPLATE="${SRC}/templates/BS_bands.bands.in"
 DOSTEMPLATE="${SRC}/templates/BS.dos.in"
 

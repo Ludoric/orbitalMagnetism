@@ -1,0 +1,6 @@
+&BANDS
+ outdir='/nfs/scratch2/trewicedwa/SmN_M/out/',
+ prefix='SmN_M',
+ filband='SmN_M-S1.bands',
+ spin_component=1,
+/

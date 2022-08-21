@@ -173,7 +173,7 @@ def plotBands(cell, datup, datdw=None, ax=None, nolegend=False):
     ax.grid(axis='x', color='k', linewidth=1, linestyle='-')
     ax.tick_params(axis='x', color='k', width=1)  # length=16,
     ax.margins(x=0)
-    # ax.set_ylim(-10, 10)
+    ax.set_ylim(-10, 10)
     ax.tick_params(axis='y', color='k', width=1)
     ax.axhline(0, c='k', linewidth=1, zorder=0)
     ax.set_ylabel('Energy [eV]')
@@ -209,7 +209,7 @@ def plotKvsHU(bandD, cell, kpoint='Gamma', orbital='Gd4f', individual=False,
     ax.plot(Hs, Sup[:, 3:], '-r', zorder=1, label='Majority Spin (↑)')
     ax.plot(Hs, Sdw[:, 3:], ':b', zorder=2, label='Minority Spin (↓)')
     removeDuplicateLabels(ax)
-    # ax.set_ylim(-10, 10)
+    ax.set_ylim(-10, 10)
     ax.set_ylabel('Energy [eV]')
     ax.set_xlabel(f'Hubbard U for {orbital} [eV]')
     ax.margins(x=0)
@@ -267,8 +267,8 @@ if __name__ == '__main__':
     # dup = readBandFile('bands-up_GdN-FCC.bands')
     # ddown = readBandFile('bands-down_GdN-FCC.bands')
     # plotBands(dup, ddown)
-    bandD = loadLotsOfData('./', './fermi.tsv', orbital='Gd-4f')
-    plotKvsHU(bandD, 'FCC', kpoint='Gamma', individual=False, orbital='Gd-4f')
+    # bandD = loadLotsOfData('./', './fermi.tsv', orbital='Gd-4f')
+    # plotKvsHU(bandD, 'FCC', kpoint='Gamma', individual=False, orbital='Gd-4f')
     # thus if the Gd4f band is 7.8eV below the fermi level, U should be 8.4eV
     # (from GdN THIN FILMS: BULK AND LOCAL ELECTRONIC...)
     # plotBandsDos('../tooBig/hubbardOut/H_Gd4f_8.00_GdN-FCC.dos',
@@ -280,9 +280,9 @@ if __name__ == '__main__':
     # plotKvsHU(bandD, kpoint='X', individual=False, orbital='Gd-5d')
     # plotBandgap(bandD, orbital='Gd-5d')
 
-    # dup = readBandFile('SmN-H1_Gd-4f_5.0_-S1.bands', zeroPoint=0)
-    # ddown = readBandFile('SmN-H1_Gd-4f_5.0_-S2.bands', zeroPoint=0)
-    # plotBands('FCC', dup, ddown)
+    dup = readBandFile('GdN_M-S1.bands', zeroPoint=13.9717)
+    ddown = readBandFile('GdN_M-S2.bands', zeroPoint=13.9717)
+    plotBands('FCC', dup, ddown)
     plt.show()
 
     # SmN - Paramagnetic phase 1.3ev from fermi measured from (5d-sup 5d-sdw)

@@ -35,3 +35,7 @@ i.e. when calculation='bands'? or for calculating k points
 Now for DOS:
 set calculation='nscf', occupations='tetrahedra', up the number of k points even more
 apparently also nosym = .TRUE.??
+
+
+can cite https://journals.aps.org/prb/abstract/10.1103/PhysRevB.104.075124
+for the SmN hubbard values (U_d and U_f for SmN are 4.3 and 6.76 eV)
