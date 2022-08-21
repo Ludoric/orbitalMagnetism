@@ -22,12 +22,12 @@ module load intel/2021b
 
 
 # Run pw to obtain the ground state
-mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in SmN_vc-relax.pw.in | tee SmN_vc-relax.pw.out
+mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in SmN_vc-relax.pw.in > SmN_vc-relax.pw.out
 # Run pw to obtain the Bloch states on a uniform k-point grid
 # !!! use the lattice output from vc-relax as input to scf and wannier90
-# mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in SmN_M_scf.pw.in | tee SmN_M_scf.pw.out
-# mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in SmN_M_nscf.pw.in | tee SmN_M_nscf.pw.out
-# mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in SmN_M_bands.pw.in | tee SmN_M_bands.pw.out
+# mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in SmN_M_scf.pw.in > SmN_M_scf.pw.out
+# mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in SmN_M_nscf.pw.in > SmN_M_nscf.pw.out
+# mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in SmN_M_bands.pw.in > SmN_M_bands.pw.out
 
 
 
@@ -38,8 +38,8 @@ mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in SmN_vc-relax.pw.in | tee SmN_vc-relax.
 # $BINLOC/bands.x < SmN_M_S2.bands.in >  SmN_M_S2.bands.out
 # # Run wannier90 to generate a list of the required overlaps (written into the Fe.nnkp file).
 # # !!!! mpi not available for wannier90.x
-# $BINLOC/wannier90.x -pp SmN_M_up | tee SmN_M_dw_1.wannier90.out
-# $BINLOC/wannier90.x -pp SmN_M_dw | tee SmN_M_dw_1.wannier90.out
+# $BINLOC/wannier90.x -pp SmN_M_up > SmN_M_dw_1.wannier90.out
+# $BINLOC/wannier90.x -pp SmN_M_dw > SmN_M_dw_1.wannier90.out
 # # Run pw2wannier90 to compute:
 # # – The overlaps <h_{unk}|u_{mk+bi}> (written in the Fe.mmn file)
 # # – The projections for the starting guess (written in the Fe.amn file)
@@ -47,14 +47,14 @@ mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in SmN_vc-relax.pw.in | tee SmN_vc-relax.
 # # !!!! pools not implemented for pw2wannier90.x
 # # !!!! there may not be more processors than bands created in SmN_M.win
 # # !!!! mpi version doesn't support output to .uHu file
-# # mpirun -np 25 "$BINLOC/pw2wannier90.x" -in SmN_M_up.pw2wan.in | tee SmN_M_up.pw2wan.out
-# # mpirun -np 25 "$BINLOC/pw2wannier90.x" -in SmN_M_dw.pw2wan.in | tee SmN_M_dw.pw2wan.out
-# $BINLOC/pw2wannier90.x < SmN_M_up.pw2wan.in | tee SmN_M_up.pw2wan.out
-# $BINLOC/pw2wannier90.x < SmN_M_dw.pw2wan.in | tee SmN_M_dw.pw2wan.out
+# # mpirun -np 25 "$BINLOC/pw2wannier90.x" -in SmN_M_up.pw2wan.in > SmN_M_up.pw2wan.out
+# # mpirun -np 25 "$BINLOC/pw2wannier90.x" -in SmN_M_dw.pw2wan.in > SmN_M_dw.pw2wan.out
+# $BINLOC/pw2wannier90.x < SmN_M_up.pw2wan.in > SmN_M_up.pw2wan.out
+# $BINLOC/pw2wannier90.x < SmN_M_dw.pw2wan.in > SmN_M_dw.pw2wan.out
 # # Run wannier90 to compute the MLWFs.
 # # !!!! mpi not available for wannier90.x
-# $BINLOC/wannier90.x SmN_M_up | tee SmN_M_up_2.wannier90.out
-# $BINLOC/wannier90.x SmN_M_dw | tee SmN_M_dw_2.wannier90.out
+# $BINLOC/wannier90.x SmN_M_up > SmN_M_up_2.wannier90.out
+# $BINLOC/wannier90.x SmN_M_dw > SmN_M_dw_2.wannier90.out
 
 
 # # !!! run this one on multiple cores again
