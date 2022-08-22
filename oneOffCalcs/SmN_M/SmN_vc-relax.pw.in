@@ -13,13 +13,13 @@
   tstress = .true.
 /
 &SYSTEM
-  degauss =   1.5d-01
+  degauss =   1.5d-02
   ecutrho =   320
   ecutwfc =   80
   ibrav = 10
   A = 5.035
   B = 5.035
-  C = 5.036
+  C = 5.0351
   nat = 2
   nosym = .false.
   nspin = 2
@@ -34,7 +34,7 @@
   Hubbard_U_back(1) = 4.3
 /
 &ELECTRONS
-  conv_thr =   1.6000000000d-08
+  conv_thr =   1.6000000000d-09
   electron_maxstep = 1000
   mixing_beta =   2.0000000000d-01
   mixing_ndim=8

@@ -1,0 +1,50 @@
+&CONTROL
+  calculation = 'vc-relax'
+  title = 'GdN_vc-relax'
+  verbosity = 'high'
+  restart_mode = 'from_scratch'
+  etot_conv_thr =   8.0000000000d-05
+  forc_conv_thr =   1.0000000000d-04
+  outdir = '/nfs/scratch2/trewicedwa/GdN_TED/out/'
+  prefix = 'GdN'
+  pseudo_dir = '/nfs/home/trewicedwa/orbitalMagnetism/pseudo/'
+  disk_io = 'low'
+  tprnfor = .true.
+  tstress = .true.
+/
+&SYSTEM
+  degauss =   1.4699723600d-02
+  ecutrho =   320
+  ecutwfc =   80
+  ibrav = 2
+  A = 4.999
+  nat = 2
+  nosym = .false.
+  nspin = 2
+  ntyp = 2
+  nbnd = 26 ! num Kohn-Sham states
+  occupations = 'smearing'
+  starting_magnetization(1) =   1.0
+  starting_magnetization(2) =   0.0
+  lda_plus_u=.true.
+  lda_plus_u_kind=0
+  Hubbard_U(1) = 8.4
+  Hubbard_U_back(1) = 6.6
+/
+&ELECTRONS
+  conv_thr =   1.6000000000d-09
+  electron_maxstep = 80
+  mixing_beta =   4.0000000000d-01
+/
+&IONS
+/
+&CELL
+/
+ATOMIC_SPECIES
+Gd     157.25   Gd.rel-pbesol-spdfn-kjpaw_psl.1.0.0.UPF
+N      14.0067 N.pbe-kjpaw.UPF
+ATOMIC_POSITIONS (crystal)
+Gd           0.0000000000       0.0000000000       0.0000000000
+N            0.5000000000       0.5000000000       0.5000000000
+K_POINTS automatic
+14 14 14 0 0 0

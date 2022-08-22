@@ -26,6 +26,10 @@ Then we run with calculation='bands'. Importantly, this time the we must specify
 I have written a (only slightly janky) python script to generate this (see bandplot_kpoints.py). My only resources when writing this script were half-remembered things that will had said over a week ago, the docs for pw.x, and the website http://lampx.tugraz.at/~hadley/ss1/bzones/fcc.php, which translated the labels for the points into their coordinates.
 
 
+Wannier pronunciation: 
+either "'von ee ay" http://ceadserv1.nku.edu/longa/classes/2009fall/mat305/resources/pronunciation.html
+or "One-nier" (reddit, therefore untrustworthy?)
+
 
 
 Questions:
@@ -39,3 +43,13 @@ apparently also nosym = .TRUE.??
 
 can cite https://journals.aps.org/prb/abstract/10.1103/PhysRevB.104.075124
 for the SmN hubbard values (U_d and U_f for SmN are 4.3 and 6.76 eV)
+
+Nice flavour for pseudopotentials:
+  GGA, PBE(sol?)
+  PAW (not ultra-soft?)
+  Fully relativistic
+  UPF format (can convert if necessary)
+  Includes the 4f electrons in the valence set 
+
+
+

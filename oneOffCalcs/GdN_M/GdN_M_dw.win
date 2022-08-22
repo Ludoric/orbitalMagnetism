@@ -1,9 +1,9 @@
 num_bands         =  25
 num_wann          =  25
 
-dis_win_min       = -5.0d0
-dis_win_max       = 40.0d0
-dis_froz_min      = 0.0d0
+dis_win_min       = -30.0d0
+dis_win_max       = 15.0d0
+dis_froz_min      = -30.0d0
 dis_froz_max      =  40.0d0
 dis_num_iter      =  500
 
