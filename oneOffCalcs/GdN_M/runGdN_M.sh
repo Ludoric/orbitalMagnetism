@@ -1,13 +1,13 @@
 #!/bin/bash
 #SBATCH --job-name=GdN_M
-#SBATCH --time=00-02:00:00
+#SBATCH --time=00-05:00:00
 #SBATCH --output=/nfs/scratch/trewicedwa/GdN_M/log_GdN_M.out
 #SBATCH --error=/nfs/scratch/trewicedwa/GdN_M/log_GdN_M.err
 #SBATCH --partition=quicktest
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=2
-#SBATCH --tasks-per-node=1
-#SBATCH --mem-per-cpu=2G
+#SBATCH --ntasks=64
+#SBATCH --cpus-per-task=1
+#SBATCH --tasks-per-node=64
+#SBATCH --mem-per-cpu=1G
 #SBATCH --nodes=1
 
 # mkdir "/nfs/scratch/trewicedwa/GdN_M/"
@@ -53,11 +53,11 @@ module load intel/2021b
 # $BINLOC/pw2wannier90.x < GdN_M_dw.pw2wan.in | tee GdN_M_dw.pw2wan.out
 # # Run wannier90 to compute the MLWFs.
 # # !!!! mpi not available for wannier90.x
-$BINLOC/wannier90.x GdN_M_up | tee GdN_M_up_2.wannier90.out
-$BINLOC/wannier90.x GdN_M_dw | tee GdN_M_dw_2.wannier90.out
+# $BINLOC/wannier90.x GdN_M_up | tee GdN_M_up_2.wannier90.out
+# $BINLOC/wannier90.x GdN_M_dw | tee GdN_M_dw_2.wannier90.out
 
 
-# # !!! run this one on multiple cores again
-# # Run postw90 to compute the orbital magnetization
-# mpirun -np 64 $BINLOC/postw90.x GdN_M_up
-# mpirun -np 64 $BINLOC/postw90.x GdN_M_dw
+# !!! run this one on multiple cores again
+# Run postw90 to compute the orbital magnetization
+mpirun -np 64 $BINLOC/postw90.x GdN_M_up
+mpirun -np 64 $BINLOC/postw90.x GdN_M_dw
