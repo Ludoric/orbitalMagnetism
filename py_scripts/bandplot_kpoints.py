@@ -8,10 +8,11 @@ def main():
         # MAKE THIS WORK WITH CELLS OTHER THAN FCC!
         print('Ggenerate k points for band plots using QUANTUM EXPRESSO')
         print('Usage:')
-        print('\tbandplot_kpoints.py NUM_POINTS CELL [ROUTE]')
+        print('\tbandplot_kpoints.py NUM_POINTS CELL [UNITS [ROUTE]]')
         print('\tWhere NUM_POINTS is an integer')
         print('\tCELL is the name of a unit cell')
-        print('\tand ROUTE is a string of labels of critical points')
+        print('\tUNITS is either "crystal" or "kvec"')
+        print('\tROUTE is a string of labels of critical points')
         print("\t\t('|' can be used to create a dicontinuity between points)")
         print("\te.g.: ./bandplot_kpoints.py 100 FCC 'ΓXWKΓLUWLK|UX'\n")
         return
@@ -20,17 +21,18 @@ def main():
     else:
         print('First argument must be a number')
         return
-    if len(sys.argv) == 2:  # DIRTY HACKS! THIS "DEFAULT VALUE" SHOULD NOT BE!
-        sys.argv.append('FCC')
-        sys.argv.append('ΓXWLΓK|UX')
+    # if len(sys.argv) == 2:  # DIRTY HACKS! THIS "DEFAULT VALUE" SHOULD NOT BE
+    #     sys.argv.append('FCC')
+    #     sys.argv.append('ΓXWLΓK|UX')
     if (cell := sys.argv[2].upper()) not in (pC := set(NAME_TO_CRYSTAL_KVEC)):
         print(f'{cell} is not a known cell\n\tTry one of {pC}')
-    if len(sys.argv) == 3:
-        # take the default route through the cell
-        route = getRecommendedRoute(cell)
+    if len(sys.argv) > 3:
+        units = sys.argv[3]
     else:
+        units = 'kvec'
+    if len(sys.argv) > 4:
         # clean the list of given critical points (excessivly complicated)
-        route = sys.argv[3].upper().replace('G', 'Γ')
+        route = sys.argv[4].upper().replace('G', 'Γ')
         Pkpts = set(NAME_TO_CRYSTAL_KVEC[cell])
         if len(route) <= 2:
             print('Please supply two or more labels from '
@@ -44,11 +46,15 @@ def main():
                 print(f'{str(wrong)[1:-1]} are not valid point labels.')
             print(f'Try some of {Pkpts} instead.')
             return
+    else:
+        # take the default route through the cell
+        route = getRecommendedRoute(cell)
 
-    print(printKpoints(NPts, cell, route).replace('Γ', 'G'))
+    print(printKpoints(NPts, cell, units, route).replace('Γ', 'G'))
 
 
-def kpoints(NPts, cell, route):
+def kpoints(NPts, cell, units, route):
+    thingFromName = crystalFromName if units == 'crystal' else kvecFromName
     # or use 'crystal_b', and change α = NAME_TO_CRYSTAL_KVEC[a][0]
     route += '|'  # if route[-1] != '|'   # ensure last character is a |
     path = []
@@ -56,9 +62,10 @@ def kpoints(NPts, cell, route):
     for a, b in zip(route, route[1:]):
         if a == '|':
             continue
+        # the distance should always be measured in kspace (I think)
         d = (np.linalg.norm(kvecFromName(a, cell)-kvecFromName(b, cell))
              if b != '|' else 0)
-        path.append([a, kvecFromName(a, cell), d])
+        path.append([a, thingFromName(a, cell), d])
         weight += d
     weight = NPts/weight
     for p in path:
@@ -66,14 +73,15 @@ def kpoints(NPts, cell, route):
     return path
 
 
-def printKpoints(NPts, cell, route):
-    path = kpoints(NPts, cell, route)
+def printKpoints(NPts, cell, units, route):
+    path = kpoints(NPts, cell, units, route)
     output = ''
     actualNPts = 0
     for n, α, w in path:
-        output += f'{α[0]:.3f} {α[1]:.3f} {α[2]:.3f} {w: 4d}  ! {n}\n'
+        output += f'{α[0]:.4f} {α[1]:.4f} {α[2]:.4f} {w: 4d}  ! {n}\n'
         actualNPts += w
-    output = (f'K_POINTS tpiba_b  ! {cell} {route}\n'
+    tpe = 'crystal_b' if units == 'crystal' else 'tpiba_b'
+    output = (f'K_POINTS {tpe}  ! {cell} {route}\n'
               + f'{len(path)}  ! total points = {actualNPts}\n' + output)
     return output
 

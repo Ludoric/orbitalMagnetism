@@ -22,7 +22,7 @@ module load intel/2021b
 
 
 # Run pw to obtain the ground state
-# mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in GdN_vc-relax.pw.in > GdN_vc-relax.pw.out
+mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in GdN_vc-relax.pw.in > GdN_vc-relax.pw.out
 # Run pw to obtain the Bloch states on a uniform k-point grid
 # !!! use the lattice output from vc-relax as input to scf and wannier90
 # mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in GdN_M_scf.pw.in > GdN_M_scf.pw.out
@@ -60,4 +60,4 @@ module load intel/2021b
 # # !!! run this one on multiple cores again
 # # Run postw90 to compute the orbital magnetization
 # mpirun -np 64 $BINLOC/postw90.x GdN_M_up
-mpirun -np 64 $BINLOC/postw90.x GdN_M_dw
+# mpirun -np 64 $BINLOC/postw90.x GdN_M_dw

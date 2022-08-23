@@ -268,7 +268,7 @@ if __name__ == '__main__':
     # ddown = readBandFile('bands-down_GdN-FCC.bands')
     # plotBands(dup, ddown)
     # bandD = loadLotsOfData('./', './fermi.tsv', orbital='Gd-4f')
-    # plotKvsHU(bandD, 'FCC', kpoint='Gamma', individual=False, orbital='Gd-4f')
+    # plotKvsHU(bandD, 'FCC', kpoint='Gamma', individual=True, orbital='Gd-4f')
     # thus if the Gd4f band is 7.8eV below the fermi level, U should be 8.4eV
     # (from GdN THIN FILMS: BULK AND LOCAL ELECTRONIC...)
     # plotBandsDos('../tooBig/hubbardOut/H_Gd4f_8.00_GdN-FCC.dos',
