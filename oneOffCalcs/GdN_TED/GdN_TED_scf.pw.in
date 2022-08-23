@@ -19,7 +19,7 @@
   ibrav = 0
   nat = 2
   nosym = .false.
-  nspin = 2
+  noncolin = .TRUE.
   ntyp = 2
   nbnd = 25 ! num Kohn-Sham states
   occupations = 'smearing'
@@ -45,7 +45,7 @@ CELL_PARAMETERS angstrom
 2.5874537 0.0000000 2.5874537
 ATOMIC_SPECIES
 Gd     157.25   Gd.rel-pbesol-spdfn-kjpaw_psl.1.0.0.UPF
-N      14.0067 N.pbe-kjpaw.UPF
+N      14.0067  N.rel-pbesol-n-kjpaw_psl.1.0.0.UPF
 ATOMIC_POSITIONS (crystal)
 Gd           0.0000000000       0.0000000000       0.0000000000
 N            0.5000000000       0.5000000000       0.5000000000

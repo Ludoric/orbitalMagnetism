@@ -22,11 +22,11 @@ module load intel/2021b
 
 # TODO:
 # Currently need to get (matching) pseudopotentials of the right kind
-# Right kind = 
+# Right kind =
 #   Fully relativisitic
 #   PBEsol
 #   PAW (not ultra-soft)
-#   Includes the 4f electrons in the valence set 
+#   Includes the 4f electrons in the valence set
 #   Preferably fully relativistic
 # Try using pbe instead of pbesol, or setting everything to pbe?
 #
