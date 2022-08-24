@@ -28,11 +28,11 @@
   starting_magnetization(2) =   0.0
   lda_plus_u=.true.
   lda_plus_u_kind=1
-  Hubbard_U(1) = 8.4
-  Hubbard_U_back(1) = 6.6
+  ! Hubbard_U(1) = 8.4
+  ! Hubbard_U_back(1) = 6.6
 /
 &ELECTRONS
-  conv_thr =   1.6000000000d-09
+  conv_thr =   1.6000000000d-08
   electron_maxstep = 1000
   mixing_beta =   4.0000000000d-01
 /
@@ -48,3 +48,6 @@ Gd           0.0000000000       0.0000000000       0.0000000000
 N            0.5000000000       0.5000000000       0.5000000000
 K_POINTS automatic
 14 14 14 0 0 0
+HUBBARD ortho-atomic
+U Gd-4F 8.4
+U Gd-5D 6.6

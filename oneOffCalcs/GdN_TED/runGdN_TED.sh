@@ -15,9 +15,11 @@
 cd "/nfs/scratch/trewicedwa/GdN_TED/"
 cp /nfs/home/trewicedwa/orbitalMagnetism/oneOffCalcs/GdN_TED/* ./
 
-BINLOC="/nfs/home/trewicedwa/qe-7.0/bin"
+# BINLOC="/nfs/home/trewicedwa/qe-7.0/bin"
 
-module load intel/2021b
+# module load intel/2021b
+module load intel/2022a
+module load QuantumESPRESSO/7.1
 
 
 # TODO:
@@ -35,7 +37,7 @@ module load intel/2021b
 
 
 # Run pw to obtain the ground state
-mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in GdN_vc-relax.pw.in > GdN_vc-relax.pw.out
+mpirun -np 64 pw.x -npool 4 -in GdN_vc-relax.pw.in > GdN_vc-relax.pw.out
 # Run pw to obtain the Bloch states on a uniform k-point grid
 # !!! use the lattice output from vc-relax as input to scf and wannier90
 # mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in GdN_TED_scf.pw.in > GdN_TED_scf.pw.out
