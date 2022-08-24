@@ -14,26 +14,26 @@
 /
 &SYSTEM
   degauss =   1.4699723600d-02
-  ecutrho =   320
-  ecutwfc =   80
+  ecutrho =   769
+  ecutwfc =   118
   ibrav = 2
   A = 4.999
   nat = 2
   nosym = .false.
   noncolin = .TRUE.
+  lspinorb = .true.
   ntyp = 2
-  nbnd = 26 ! num Kohn-Sham states
   occupations = 'smearing'
   starting_magnetization(1) =   1.0
   starting_magnetization(2) =   0.0
   lda_plus_u=.true.
-  lda_plus_u_kind=0
+  lda_plus_u_kind=1
   Hubbard_U(1) = 8.4
   Hubbard_U_back(1) = 6.6
 /
 &ELECTRONS
   conv_thr =   1.6000000000d-09
-  electron_maxstep = 80
+  electron_maxstep = 1000
   mixing_beta =   4.0000000000d-01
 /
 &IONS

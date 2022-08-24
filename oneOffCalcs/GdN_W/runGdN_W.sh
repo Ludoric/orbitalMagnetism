@@ -10,7 +10,7 @@
 #SBATCH --mem-per-cpu=1G
 #SBATCH --nodes=1
 
-thing_one='true'
+thing_three='true'
 
 # mkdir "/nfs/scratch/trewicedwa/GdN_W/"
 # mkdir "/nfs/scratch/trewicedwa/GdN_W/out"
@@ -26,12 +26,14 @@ AWKSTR='{
 
 module load intel/2021b
 
+START=$(date +%s.%N)
+
 if [ "$thing_one" = true ]; then
+ST=$(date +%s.%N)
 # Run pw to obtain the ground state
 # mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in GdN_vc-relax.pw.in > GdN_vc-relax.pw.out
 # Run pw to obtain the Bloch states on a uniform k-point grid
 # !!! use the lattice output from vc-relax as input to scf and wannier90
-ST=$(date +%s.%N)
 mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in GdN_W_scf.pw.in > GdN_W_scf.pw.out
 echo "$(date +%s.%N) $ST GdN_W_scf.pw" | awk "$AWKSTR" ; ST=$(date +%s.%N)
 mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in GdN_W_nscf.pw.in > GdN_W_nscf.pw.out
@@ -39,11 +41,12 @@ echo "$(date +%s.%N) $ST GdN_W_nscf.pw" | awk "$AWKSTR" ; ST=$(date +%s.%N)
 mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in GdN_B_scf.pw.in > GdN_B_scf.pw.out
 echo "$(date +%s.%N) $ST GdN_B_scf.pw" | awk "$AWKSTR" ; ST=$(date +%s.%N)
 mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in GdN_B_bands.pw.in > GdN_B_bands.pw.out
-echo "$(date +%s.%N) $ST GdN_B_bands.pw" | awk "$AWKSTR" ; ST=$(date +%s.%N)
+echo "$(date +%s.%N) $ST GdN_B_bands.pw" | awk "$AWKSTR"
 fi
 
 
 if [ "$thing_two" = true ]; then
+ST=$(date +%s.%N)
 # !!! run this section on a single CPU - it'll take a while, but at least will finish
 # BANDS CALCULATIONS in qauntum espresso
 $BINLOC/bands.x < GdN_W_S1.bands.in >  GdN_W_S1.bands.out
@@ -74,17 +77,18 @@ echo "$(date +%s.%N) $ST GdN_W_dw.pw2wan" | awk "$AWKSTR" ; ST=$(date +%s.%N)
 $BINLOC/wannier90.x GdN_W_up > GdN_W_up_2.wannier90.out
 echo "$(date +%s.%N) $ST GdN_W_up_2.wannier90" | awk "$AWKSTR" ; ST=$(date +%s.%N)
 $BINLOC/wannier90.x GdN_W_dw > GdN_W_dw_2.wannier90.out
-echo "$(date +%s.%N) $ST GdN_W_dw_2.wannier90" | awk "$AWKSTR" ; ST=$(date +%s.%N)
+echo "$(date +%s.%N) $ST GdN_W_dw_2.wannier90" | awk "$AWKSTR"
 fi
 
 
 if [ "$thing_three" = true ]; then
+ST=$(date +%s.%N)
 # !!! run this one on multiple cores again
 # Run postw90 to compute the orbital magnetization
 mpirun -np 64 $BINLOC/postw90.x GdN_W_up
 echo "$(date +%s.%N) $ST postw90.x-GdN_W_up" | awk "$AWKSTR" ; ST=$(date +%s.%N)
 mpirun -np 64 $BINLOC/postw90.x GdN_W_dw
-echo "$(date +%s.%N) $ST postw90.x-GdN_W_dw" | awk "$AWKSTR" ; ST=$(date +%s.%N)
+echo "$(date +%s.%N) $ST postw90.x-GdN_W_dw" | awk "$AWKSTR"
 fi
 
-echo -e "\nSCRIPT FINISHED! (you can stop waiting now)"
+echo "$(date +%s.%N) $START \nSCRIPT FINISHED!" | awk "$AWKSTR"
