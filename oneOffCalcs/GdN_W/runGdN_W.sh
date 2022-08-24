@@ -4,10 +4,10 @@
 #SBATCH --output=/nfs/scratch/trewicedwa/GdN_W/log.out
 #SBATCH --error=/nfs/scratch/trewicedwa/GdN_W/log.err
 #SBATCH --partition=quicktest
-#SBATCH --ntasks=64
-#SBATCH --cpus-per-task=1
-#SBATCH --tasks-per-node=64
-#SBATCH --mem-per-cpu=1G
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=2
+#SBATCH --tasks-per-node=1
+#SBATCH --mem-per-cpu=2G
 #SBATCH --nodes=1
 
 thing_three='true'
@@ -49,10 +49,10 @@ if [ "$thing_two" = true ]; then
 ST=$(date +%s.%N)
 # !!! run this section on a single CPU - it'll take a while, but at least will finish
 # BANDS CALCULATIONS in qauntum espresso
-$BINLOC/bands.x < GdN_W_S1.bands.in >  GdN_W_S1.bands.out
-echo "$(date +%s.%N) $ST GdN_W_S1.bands" | awk "$AWKSTR" ; ST=$(date +%s.%N)
-$BINLOC/bands.x < GdN_W_S2.bands.in >  GdN_W_S2.bands.out
-echo "$(date +%s.%N) $ST GdN_W_S2.bands" | awk "$AWKSTR" ; ST=$(date +%s.%N)
+$BINLOC/bands.x < GdN_B_S1.bands.in >  GdN_B_S1.bands.out
+echo "$(date +%s.%N) $ST GdN_B_S1.bands" | awk "$AWKSTR" ; ST=$(date +%s.%N)
+$BINLOC/bands.x < GdN_B_S2.bands.in >  GdN_B_S2.bands.out
+echo "$(date +%s.%N) $ST GdN_B_S2.bands" | awk "$AWKSTR" ; ST=$(date +%s.%N)
 # Run wannier90 to generate a list of the required overlaps (written into the Fe.nnkp file).
 # !!!! mpi not available for wannier90.x
 $BINLOC/wannier90.x -pp GdN_W_up > GdN_W_up_1.wannier90.out
