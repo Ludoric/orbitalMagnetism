@@ -21,13 +21,13 @@
   nat = 2
   nosym = .false.
   noncolin = .TRUE.
+  lspinorb = .true.
   ntyp = 2
-  nbnd = 26 ! num Kohn-Sham states
   occupations = 'smearing'
   starting_magnetization(1) =   1.0
   starting_magnetization(2) =   0.0
   lda_plus_u=.true.
-  lda_plus_u_kind=0
+  lda_plus_u_kind=1
   Hubbard_U(1) = 8.4
   Hubbard_U_back(1) = 6.6
 /
