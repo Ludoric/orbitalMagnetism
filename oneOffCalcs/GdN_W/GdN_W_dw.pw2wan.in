@@ -1,8 +1,8 @@
 &inputpp
-   outdir = '/nfs/scratch2/trewicedwa/GdN_M/out/'
-   prefix = 'GdN_M'
-   seedname = 'GdN_M_up'
-   spin_component = 'up'
+   outdir = '/nfs/scratch2/trewicedwa/GdN_W/out/'
+   prefix = 'GdN_W'
+   seedname = 'GdN_W_dw'
+   spin_component = 'down'
    write_mmn = .true.
    write_amn = .true.
    write_uHu = .false.

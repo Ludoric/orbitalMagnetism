@@ -103,7 +103,7 @@ def plotDOS(datdos, ax=None, onY=False):
     if ax:
         f = None
     else:
-        f = plt.figure()
+        f = plt.figure(figsize=(9, 6))
         f.tight_layout()
         ax = f.add_subplot()
     if onY:
@@ -148,9 +148,11 @@ def plotBands(cell, datup, datdw=None, ax=None, nolegend=False):
     if ax:
         f = None
     else:
-        f = plt.figure()
+        # f = plt.figure(figsize=(9, 6))
+        # f.tight_layout()
+        # ax = f.add_subplot()
+        f, (ax) = plt.subplots(ncols=1, figsize=(9, 6))
         f.tight_layout()
-        ax = f.add_subplot()
     horiz = np.linspace(0, 1, datup.shape[0])
     if datdw is not None:
         if np.array_equal(datup[:, :3], datdw[:, :3]):
@@ -203,7 +205,7 @@ def plotKvsHU(bandD, cell, kpoint='Gamma', orbital='Gd4f', individual=False,
     # (already sorted by calling sorted(bandD.items()))
 
     if not ax:
-        f = plt.figure()
+        f = plt.figure(figsize=(9, 6))
         f.tight_layout()
         ax = f.add_subplot()
     ax.plot(Hs, Sup[:, 3:], '-r', zorder=1, label='Majority Spin (↑)')
@@ -233,7 +235,7 @@ def plotBandgap(bandD, orbital='Gd4f', ax=None):
     # (already sorted by calling sorted(bandD.items()))
 
     if not ax:
-        f = plt.figure()
+        f = plt.figure(figsize=(9, 6))
         f.tight_layout()
         ax = f.add_subplot()
     ax.plot(Hs, Sup, '-r', zorder=1, label='Majority Spin (↑)')
@@ -280,9 +282,13 @@ if __name__ == '__main__':
     # plotKvsHU(bandD, kpoint='X', individual=False, orbital='Gd-5d')
     # plotBandgap(bandD, orbital='Gd-5d')
 
+    # dup = readBandFile('GdN_M-S1.bands', zeroPoint=13.9718)
+    # ddown = readBandFile('GdN_M-S2.bands', zeroPoint=13.9718)
     dup = readBandFile('SmN_M-S1.bands', zeroPoint=9.5132)
     ddown = readBandFile('SmN_M-S2.bands', zeroPoint=9.5132)
-    plotBands('FCC', dup, ddown)
+    f, ax = plotBands('FCC', dup, ddown)
+    ax.set_ylim((-15, 15))
+    f.savefig('SmN_M_pw_Bands.pdf', bbox_inches='tight')
     plt.show()
 
     # SmN - Paramagnetic phase 1.3ev from fermi measured from (5d-sup 5d-sdw)

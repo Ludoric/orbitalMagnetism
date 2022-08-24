@@ -1,12 +1,12 @@
 &CONTROL
-  calculation = 'vc-relax'
-  title = 'GdN_vc-relax'
+  calculation = 'scf'
+  title = 'GdN_W_scf'
   verbosity = 'high'
   restart_mode = 'from_scratch'
   etot_conv_thr =   8.0000000000d-05
   forc_conv_thr =   1.0000000000d-04
-  outdir = '/nfs/scratch2/trewicedwa/GdN_M/out/'
-  prefix = 'GdN'
+  outdir = '/nfs/scratch2/trewicedwa/GdN_W/out/'
+  prefix = 'GdN_B'
   pseudo_dir = '/nfs/home/trewicedwa/orbitalMagnetism/pseudo/'
   disk_io = 'low'
   tprnfor = .true.
@@ -16,13 +16,12 @@
   degauss =   1.4699723600d-02
   ecutrho =   320
   ecutwfc =   80
-  ibrav = 2
-  A = 4.999
+  ibrav = 0
   nat = 2
   nosym = .false.
   nspin = 2
   ntyp = 2
-  nbnd = 26 ! num Kohn-Sham states
+  nbnd = 25 ! num Kohn-Sham states
   occupations = 'smearing'
   starting_magnetization(1) =   1.0
   starting_magnetization(2) =   0.0
@@ -40,6 +39,10 @@
 /
 &CELL
 /
+CELL_PARAMETERS angstrom
+2.5874524230 2.5874524230 0.0000000000
+0.0000000000 2.5874524230 2.5874524230
+2.5874524230 0.0000000000 2.5874524230
 ATOMIC_SPECIES
 Gd     157.25 Gd.GGA-PBE-paw-v1.0.UPF
 N      14.0067 N.pbe-kjpaw.UPF
