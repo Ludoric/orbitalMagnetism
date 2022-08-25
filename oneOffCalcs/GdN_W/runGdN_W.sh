@@ -7,10 +7,10 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2
 #SBATCH --tasks-per-node=1
-#SBATCH --mem-per-cpu=2G
+#SBATCH --mem-per-cpu=1G
 #SBATCH --nodes=1
 
-thing_three='true'
+thing_two='true'
 
 # mkdir "/nfs/scratch/trewicedwa/GdN_W/"
 # mkdir "/nfs/scratch/trewicedwa/GdN_W/out"
@@ -91,4 +91,4 @@ mpirun -np 64 $BINLOC/postw90.x GdN_W_dw
 echo "$(date +%s.%N) $ST postw90.x-GdN_W_dw" | awk "$AWKSTR"
 fi
 
-echo "$(date +%s.%N) $START \nSCRIPT FINISHED!" | awk "$AWKSTR"
+echo "$(date +%s.%N) $START \nSCRIPT_FINISHED!" | awk "$AWKSTR"

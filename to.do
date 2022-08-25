@@ -1,13 +1,8 @@
 
+!!!
+YOU CANNOT RUN VC-RELAX WITH SOC (+hubbard?)
+- QE doesn't know how to calculate forces in this instance (yet)
 
+Instead: run vc-relax on the cell with nspin=2, then just do a scf with SOC
+Then continue as usual?
 
-get cell ecutrho from UPF files!!!
-
-
-ERROR in GdN_TED (fully relativistic)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    task #        57
-    from iosys : error #         1
-    simplified LDA+U not implemented with noncol. magnetism, use lda_plus_u_kind = 1
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

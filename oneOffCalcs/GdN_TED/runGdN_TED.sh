@@ -1,14 +1,14 @@
 #!/bin/bash
 #SBATCH --job-name=GdN_TED
-#SBATCH --time=00-02:00:00
+#SBATCH --time=00-05:00:00
 #SBATCH --output=/nfs/scratch/trewicedwa/GdN_TED/log_GdN_TED.out
 #SBATCH --error=/nfs/scratch/trewicedwa/GdN_TED/log_GdN_TED.err
 #SBATCH --partition=quicktest
-#SBATCH --ntasks=64
+#SBATCH --ntasks=128
 #SBATCH --cpus-per-task=1
 #SBATCH --tasks-per-node=64
 #SBATCH --mem-per-cpu=1G
-#SBATCH --nodes=1
+#SBATCH --nodes=2
 
 # mkdir "/nfs/scratch/trewicedwa/GdN_TED/"
 # mkdir "/nfs/scratch/trewicedwa/GdN_TED/out"
@@ -37,7 +37,7 @@ module load QuantumESPRESSO/7.1
 
 
 # Run pw to obtain the ground state
-mpirun -np 64 pw.x -npool 4 -in GdN_vc-relax.pw.in > GdN_vc-relax.pw.out
+mpirun -np 64 pw.x -npool 8 -in GdN_vc-relax.pw.in > GdN_vc-relax.pw.out
 # Run pw to obtain the Bloch states on a uniform k-point grid
 # !!! use the lattice output from vc-relax as input to scf and wannier90
 # mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in GdN_TED_scf.pw.in > GdN_TED_scf.pw.out
