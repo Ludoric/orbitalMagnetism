@@ -282,13 +282,13 @@ if __name__ == '__main__':
     # plotKvsHU(bandD, kpoint='X', individual=False, orbital='Gd-5d')
     # plotBandgap(bandD, orbital='Gd-5d')
 
-    # dup = readBandFile('GdN_M-S1.bands', zeroPoint=13.9718)
-    # ddown = readBandFile('GdN_M-S2.bands', zeroPoint=13.9718)
-    dup = readBandFile('SmN_M-S1.bands', zeroPoint=9.5132)
-    ddown = readBandFile('SmN_M-S2.bands', zeroPoint=9.5132)
+    dup = readBandFile('GdN_W-S1.bands', zeroPoint=13.9718)
+    ddown = readBandFile('GdN_W-S2.bands', zeroPoint=13.9718)
+    # dup = readBandFile('SmN_M-S1.bands', zeroPoint=9.5132)
+    # ddown = readBandFile('SmN_M-S2.bands', zeroPoint=9.5132)
     f, ax = plotBands('FCC', dup, ddown)
     ax.set_ylim((-15, 15))
-    f.savefig('SmN_M_pw_Bands.pdf', bbox_inches='tight')
+    f.savefig('SmN_W_pw_Bands.pdf', bbox_inches='tight')
     plt.show()
 
     # SmN - Paramagnetic phase 1.3ev from fermi measured from (5d-sup 5d-sdw)
