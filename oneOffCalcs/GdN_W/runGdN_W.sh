@@ -32,6 +32,7 @@ if [ "$thing_one" = true ]; then
 ST=$(date +%s.%N)
 # Run pw to obtain the ground state
 mpirun -np 128 "$BINLOC/pw.x" -npool 4 -in GdN_vc-relax.pw.in > GdN_vc-relax.pw.out
+echo "$(date +%s.%N) $ST GdN_vc-relax.pw" | awk "$AWKSTR" ; ST=$(date +%s.%N)
 # Run pw to obtain the Bloch states on a uniform k-point grid
 # !!! use the lattice output from vc-relax as input to scf and wannier90
 mpirun -np 128 "$BINLOC/pw.x" -npool 4 -in GdN_W_scf.pw.in > GdN_W_scf.pw.out
