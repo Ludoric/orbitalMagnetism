@@ -1,7 +1,7 @@
-num_bands         =  26
+num_bands         =  25
 num_wann          =  25
 
-restart='plot'
+restart = default
 
 dis_win_min       = -30.0d0
 dis_froz_min      = -30.0d0
@@ -38,6 +38,7 @@ berry_kmesh = 25 25 25
 
 # make the 3d plots (this will take ages!)
 wannier_plot = true
+wannier_plot_list = 13-21
 # plot with "xcrysden --xsf GdN_W_dw_00001.xsf"
 
 

@@ -11,7 +11,7 @@
 #SBATCH --nodes=2
 #SBATCH--constraint="IB"
 
-thing_one='true'
+thing_three='true'
 
 # mkdir "/nfs/scratch/trewicedwa/GdN_W/"
 # mkdir "/nfs/scratch/trewicedwa/GdN_W/out"
