@@ -282,8 +282,8 @@ if __name__ == '__main__':
     # plotKvsHU(bandD, kpoint='X', individual=False, orbital='Gd-5d')
     # plotBandgap(bandD, orbital='Gd-5d')
 
-    dup = readBandFile('GdN_W-S1.bands', zeroPoint=13.9718)
-    ddown = readBandFile('GdN_W-S2.bands', zeroPoint=13.9718)
+    dup = readBandFile('GdN-S1.bands', zeroPoint=13.9718)
+    ddown = readBandFile('GdN-S2.bands', zeroPoint=13.9718)
     # dup = readBandFile('SmN_M-S1.bands', zeroPoint=9.5132)
     # ddown = readBandFile('SmN_M-S2.bands', zeroPoint=9.5132)
     f, ax = plotBands('FCC', dup, ddown)
