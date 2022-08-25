@@ -4,10 +4,10 @@ import bandplot_kpoints as kp
 
 
 def main():
-    # plotBandsDosW90('GdN_M_up', 'GdN_M_dw', 13.9718, 'FCC', dos_clip=55,
-    #                 outName='GdN_M_W90_Bands+DOS.pdf')
-    plotBandsDosW90('SmN_M_up', 'SmN_M_dw', 9.8114, 'FCC', dos_clip=55,
-                    ylim=(-15, 15), outName='SmN_M_W90_Bands+DOS.pdf')
+    plotBandsDosW90('GdN_W_up', 'GdN_W_dw', 13.9718, 'FCC', dos_clip=55,
+                    ylim=(-10, 10), outName='GdN_W_W90_Bands+DOS.pdf')
+    # plotBandsDosW90('SmN_M_up', 'SmN_M_dw', 9.8114, 'FCC', dos_clip=55,
+    #                 ylim=(-15, 15), outName='SmN_M_W90_Bands+DOS.pdf')
 
     plt.show()
 

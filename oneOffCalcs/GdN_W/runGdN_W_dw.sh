@@ -7,7 +7,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2
 #SBATCH --tasks-per-node=1
-#SBATCH --mem-per-cpu=1G
+#SBATCH --mem-per-cpu=8G
 #SBATCH --nodes=1
 
 # mkdir "/nfs/scratch/trewicedwa/GdN_W/"
@@ -27,14 +27,14 @@ module load intel/2021b
 START=$(date +%s.%N)
 
 ST=$(date +%s.%N)
-$BINLOC/bands.x < GdN_B_S2.bands.in >  GdN_B_S2.bands.out
-echo "$(date +%s.%N) $ST GdN_B_S2.bands" | awk "$AWKSTR" ; ST=$(date +%s.%N)
-
-$BINLOC/wannier90.x -pp GdN_W_dw > GdN_W_dw_1.wannier90.out
-echo "$(date +%s.%N) $ST GdN_W_dw_1.wannier90" | awk "$AWKSTR" ; ST=$(date +%s.%N)
-
-$BINLOC/pw2wannier90.x < GdN_W_dw.pw2wan.in > GdN_W_dw.pw2wan.out
-echo "$(date +%s.%N) $ST GdN_W_dw.pw2wan" | awk "$AWKSTR" ; ST=$(date +%s.%N)
+# $BINLOC/bands.x < GdN_B_S2.bands.in >  GdN_B_S2.bands.out
+# echo "$(date +%s.%N) $ST GdN_B_S2.bands" | awk "$AWKSTR" ; ST=$(date +%s.%N)
+#
+# $BINLOC/wannier90.x -pp GdN_W_dw > GdN_W_dw_1.wannier90.out
+# echo "$(date +%s.%N) $ST GdN_W_dw_1.wannier90" | awk "$AWKSTR" ; ST=$(date +%s.%N)
+#
+# $BINLOC/pw2wannier90.x < GdN_W_dw.pw2wan.in > GdN_W_dw.pw2wan.out
+# echo "$(date +%s.%N) $ST GdN_W_dw.pw2wan" | awk "$AWKSTR" ; ST=$(date +%s.%N)
 
 $BINLOC/wannier90.x GdN_W_dw > GdN_W_dw_2.wannier90.out
 echo "$(date +%s.%N) $ST GdN_W_dw_2.wannier90" | awk "$AWKSTR" ; ST=$(date +%s.%N)

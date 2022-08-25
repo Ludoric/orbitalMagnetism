@@ -1,5 +1,7 @@
-num_bands         =  25
+num_bands         =  26
 num_wann          =  25
+
+restart='plot'
 
 dis_win_min       = -30.0d0
 dis_froz_min      = -30.0d0
@@ -31,7 +33,7 @@ iprint = 2
 # plot the optical dos
 berry = true
 berry_task = kubo
-berry_kmesh = 25 25 25
+berry_kmesh = 24 24 24
 
 
 # make the 3d plots (this will take ages!)
@@ -57,7 +59,7 @@ end kpoint_path
 
 boltz_calc_also_dos = true
 dos = true
-dos_kmesh = 25
+dos_kmesh = 24
 
 
 

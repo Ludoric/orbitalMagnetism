@@ -1,5 +1,7 @@
-num_bands         =  25
+num_bands         =  26
 num_wann          =  25
+
+restart='plot'
 
 dis_win_min       = -30.0d0
 dis_froz_min      = -30.0d0

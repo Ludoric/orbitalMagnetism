@@ -4,11 +4,12 @@
 #SBATCH --output=/nfs/scratch/trewicedwa/GdN_W/log.out
 #SBATCH --error=/nfs/scratch/trewicedwa/GdN_W/log.err
 #SBATCH --partition=quicktest
-#SBATCH --ntasks=128
+#SBATCH --ntasks=64
 #SBATCH --cpus-per-task=1
 #SBATCH --tasks-per-node=64
 #SBATCH --mem-per-cpu=1G
 #SBATCH --nodes=2
+#SBATCH--constraint="IB"
 
 thing_one='true'
 
@@ -31,17 +32,17 @@ START=$(date +%s.%N)
 if [ "$thing_one" = true ]; then
 ST=$(date +%s.%N)
 # Run pw to obtain the ground state
-mpirun -np 128 "$BINLOC/pw.x" -npool 4 -in GdN_vc-relax.pw.in > GdN_vc-relax.pw.out
+mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in GdN_vc-relax.pw.in > GdN_vc-relax.pw.out
 echo "$(date +%s.%N) $ST GdN_vc-relax.pw" | awk "$AWKSTR" ; ST=$(date +%s.%N)
 # Run pw to obtain the Bloch states on a uniform k-point grid
 # !!! use the lattice output from vc-relax as input to scf and wannier90
-mpirun -np 128 "$BINLOC/pw.x" -npool 4 -in GdN_W_scf.pw.in > GdN_W_scf.pw.out
+mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in GdN_W_scf.pw.in > GdN_W_scf.pw.out
 echo "$(date +%s.%N) $ST GdN_W_scf.pw" | awk "$AWKSTR" ; ST=$(date +%s.%N)
-mpirun -np 128 "$BINLOC/pw.x" -npool 4 -in GdN_W_nscf.pw.in > GdN_W_nscf.pw.out
+mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in GdN_W_nscf.pw.in > GdN_W_nscf.pw.out
 echo "$(date +%s.%N) $ST GdN_W_nscf.pw" | awk "$AWKSTR" ; ST=$(date +%s.%N)
-mpirun -np 128 "$BINLOC/pw.x" -npool 4 -in GdN_B_scf.pw.in > GdN_B_scf.pw.out
+mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in GdN_B_scf.pw.in > GdN_B_scf.pw.out
 echo "$(date +%s.%N) $ST GdN_B_scf.pw" | awk "$AWKSTR" ; ST=$(date +%s.%N)
-mpirun -np 128 "$BINLOC/pw.x" -npool 4 -in GdN_B_bands.pw.in > GdN_B_bands.pw.out
+mpirun -np 64 "$BINLOC/pw.x" -npool 4 -in GdN_B_bands.pw.in > GdN_B_bands.pw.out
 echo "$(date +%s.%N) $ST GdN_B_bands.pw" | awk "$AWKSTR"
 fi
 
@@ -86,9 +87,9 @@ if [ "$thing_three" = true ]; then
 ST=$(date +%s.%N)
 # !!! run this one on multiple cores again
 # Run postw90 to compute the orbital magnetization
-mpirun -np 128 $BINLOC/postw90.x GdN_W_up
+mpirun -np 64 $BINLOC/postw90.x GdN_W_up
 echo "$(date +%s.%N) $ST postw90.x-GdN_W_up" | awk "$AWKSTR" ; ST=$(date +%s.%N)
-mpirun -np 128 $BINLOC/postw90.x GdN_W_dw
+mpirun -np 64 $BINLOC/postw90.x GdN_W_dw
 echo "$(date +%s.%N) $ST postw90.x-GdN_W_dw" | awk "$AWKSTR"
 fi
 

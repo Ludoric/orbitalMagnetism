@@ -21,7 +21,7 @@
   nosym = .true.
   nspin = 2
   ntyp = 2
-  nbnd = 25 ! num Kohn-Sham states
+  nbnd = 26 ! num Kohn-Sham states
   occupations = 'smearing'
   starting_magnetization(1) =   1.0
   starting_magnetization(2) =   0.0
