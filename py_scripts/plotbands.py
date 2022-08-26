@@ -2,7 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-import bandplot_kpoints as kp
+# import bandplot_kpoints as kp
 from pathlib import Path
 import re
 # import mpl_sqrtaxis
@@ -24,12 +24,23 @@ def readBandFile(fname, zeroPoint=0):
             elif 'nks' in line[i]:
                 nks = int(line[i+1].strip(','))
         for _ in range(nks):
+            f.readline()  # skip the damm coordinates for now
             values = []
-            while len(values) < nbnd + 3:
+            while len(values) < nbnd:
                 values.extend(f.readline().split())
             dat.append(np.array(values, float))
+    with open(fname+'.rap', 'r') as f:
+        # assume the nbnd and nks are the same as before
+        f.readline()
+        isCritial = []
+        for _ in range(nks):
+            isCritial.append(f.readline().split()[-1])
+            Nvals = 0
+            while Nvals < nbnd:  # I don't know what these values mean
+                Nvals += len(f.readline().split())
     dat = np.array(dat)
-    dat[:, 3:] -= zeroPoint
+    dat -= zeroPoint
+    dat = np.concatenate((np.atleast_2d(isCritial) == 'T', dat.T))
     return dat  # , nks, nbnd
 
 
@@ -144,7 +155,7 @@ def plotDOS(datdos, ax=None, onY=False):
     return f, ax
 
 
-def plotBands(cell, datup, datdw=None, ax=None, nolegend=False):
+def plotBands(route, datup, datdw=None, ax=None, nolegend=False):
     if ax:
         f = None
     else:
@@ -153,23 +164,37 @@ def plotBands(cell, datup, datdw=None, ax=None, nolegend=False):
         # ax = f.add_subplot()
         f, (ax) = plt.subplots(ncols=1, figsize=(9, 6))
         f.tight_layout()
-    horiz = np.linspace(0, 1, datup.shape[0])
+    horiz = np.linspace(0, 1, datup.shape[1])
     if datdw is not None:
-        if np.array_equal(datup[:, :3], datdw[:, :3]):
-            for i in range(3, datdw.shape[1]):
-                ax.plot(horiz, datdw[:, i], ':b', zorder=2,
+        if np.array_equal(datup[0], datdw[0]):
+            for i in range(1, datdw.shape[0]):
+                ax.plot(horiz, datdw[i], ':b', zorder=2,
                         label='Minority Spin (↓)')
         else:
             print('Spin up and spin down coordinates do not match.')
             print('\tSpin down data has been ignored')
-    for i in range(3, datup.shape[1]):
-        ax.plot(horiz, datup[:, i], '-r', zorder=1, label='Majority Spin (↑)')
-    kpoints_x = []
-    kpoints_n = []
-    for h, l in zip(horiz, datup[:, :3]):
-        if kpoint := kp.nameFromKvec(l, cell):
-            kpoints_x.append(h)
-            kpoints_n.append(kpoint)
+    for i in range(1, datup.shape[0]):
+        ax.plot(horiz, datup[i], '-r', zorder=1, label='Majority Spin (↑)')
+    # kpoints_x = []
+    # kpoints_n = []
+    # for h, l in zip(horiz, datup[:, :3]):
+    #     if kpoint := kp.nameFromKvec(l, cell):
+    #         kpoints_x.append(h)
+    #         kpoints_n.append(kpoint)
+    kpoints_x = horiz[datup[0] == 1]
+    kpoints_n = [*route.replace('|', '')]
+    drop = np.diff(np.where(datup[0] == 1)[0]) < 2
+    for d in np.where(drop)[0]:
+        kpoints_n[d] += '|' + kpoints_n.pop(d+1)
+    kpoints_x = kpoints_x[np.append(drop != True, True)]
+    # while '|' in kpoints_n:
+    #     i = kpoints_n.index('|')
+    #     kpoints_n.pop(i)
+    #     kpoints_n[i-1] += kpoints_n.pop(i)  # maybe I don't need this
+
+    kpoints_n = kpoints_n[:len(kpoints_x)]
+    kpoints_n += ['?']*(len(kpoints_x) - len(kpoints_n))
+
     ax.set_xticks(kpoints_x)
     ax.set_xticklabels(kpoints_n)
     ax.grid(axis='x', color='k', linewidth=1, linestyle='-')
@@ -184,19 +209,23 @@ def plotBands(cell, datup, datdw=None, ax=None, nolegend=False):
     return f, ax
 
 
-def plotKvsHU(bandD, cell, kpoint='Gamma', orbital='Gd4f', individual=False,
+def plotKvsHU(bandD, route, kpoint='G', orbital='Gd4f', individual=False,
               ax=None):
     # kindex = [kp.nameFromKvec(r) for r in (bandD.values(), )[0]['↑'][:, :3]
     #           ].index(kpoint)
-    for kindex, r in enumerate(tuple(bandD.values())[0]['↑'][:, :3]):
-        if kp.nameFromKvec(r, cell) == kpoint:
-            break
+    # for kindex, r in enumerate([:, :3]):
+    #     if kp.nameFromKvec(r, cell) == kpoint:
+    #         break
+
+    # this is potentially horribly wrong
+    kindex = np.where(tuple(bandD.values())[0]['↑'][0]
+                      )[route.replace('|', '').index(kpoint)]
     Sup, Sdw, Hs = [], [], []
     for HU, S in sorted(bandD.items()):
         if individual:
-            plotBands(cell, S['↑'], S.get('↓'))
-        Sup.append(S['↑'][kindex, 3:])
-        Sdw.append(S['↓'][kindex, 3:])
+            plotBands(route, S['↑'], S.get('↓'))
+        Sup.append(S['↑'][1:, kindex])
+        Sdw.append(S['↓'][1:, kindex])
         Hs.append(HU)
     Sup, Sdw, Hs = np.array(Sup), np.array(Sdw), np.array(Hs)
     # # sort all three arrays by the Hubbard U parameter
@@ -208,8 +237,8 @@ def plotKvsHU(bandD, cell, kpoint='Gamma', orbital='Gd4f', individual=False,
         f = plt.figure(figsize=(9, 6))
         f.tight_layout()
         ax = f.add_subplot()
-    ax.plot(Hs, Sup[:, 3:], '-r', zorder=1, label='Majority Spin (↑)')
-    ax.plot(Hs, Sdw[:, 3:], ':b', zorder=2, label='Minority Spin (↓)')
+    ax.plot(Hs, Sup, '-r', zorder=1, label='Majority Spin (↑)')
+    ax.plot(Hs, Sdw, ':b', zorder=2, label='Minority Spin (↓)')
     removeDuplicateLabels(ax)
     ax.set_ylim(-10, 10)
     ax.set_ylabel('Energy [eV]')
@@ -282,13 +311,13 @@ if __name__ == '__main__':
     # plotKvsHU(bandD, kpoint='X', individual=False, orbital='Gd-5d')
     # plotBandgap(bandD, orbital='Gd-5d')
 
-    dup = readBandFile('thing.bands', zeroPoint=13.9718)
-    # ddown = readBandFile('GdN-S2.bands', zeroPoint=13.9718)
+    dup = readBandFile('GdN_B-S1.bands', zeroPoint=13.9718)
+    ddw = readBandFile('GdN_B-S2.bands', zeroPoint=13.9718)
     # dup = readBandFile('SmN_M-S1.bands', zeroPoint=9.5132)
     # ddown = readBandFile('SmN_M-S2.bands', zeroPoint=9.5132)
-    f, ax = plotBands('FCC', dup, None)
+    f, ax = plotBands('ΓXWKΓLUWLK|UX', dup, ddw)
     # ax.set_ylim((-15, 15))
-    f.savefig('SmN_W_pw_Bands.pdf', bbox_inches='tight')
+    f.savefig('GdN_B_PW_Bands.pdf', bbox_inches='tight')
     plt.show()
 
     # SmN - Paramagnetic phase 1.3ev from fermi measured from (5d-sup 5d-sdw)

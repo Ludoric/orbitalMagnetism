@@ -1,13 +1,19 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import bandplot_kpoints as kp
+import matplotlib as mpl
+
+
+mpl.rcParams['savefig.format'] = 'pdf'
 
 
 def main():
-    plotBandsDosW90('GdN_W_up', 'GdN_W_dw', 13.9718, 'FCC', dos_clip=55,
+    plotBandsDosW90('GdN_W_up', 'GdN_W_dw', 0, 'FCC', dos_clip=55,
                     ylim=(-10, 10), outName='GdN_W_W90_Bands+DOS.pdf')
     # plotBandsDosW90('SmN_M_up', 'SmN_M_dw', 9.8114, 'FCC', dos_clip=55,
     #                 ylim=(-15, 15), outName='SmN_M_W90_Bands+DOS.pdf')
+    plotJdosW90('GdN_W_up', 'GdN_W_dw', 13.9718, 'FCC', dos_clip=55,
+                outName='GdN_W_W90_JDOS.pdf')
 
     plt.show()
 
@@ -66,6 +72,51 @@ def plotBandsDosW90(fup, fdw, fermi, cell, *, dos_clip=None,
                     direction='out')  # length=16,
     ax2.set_xlabel('DOS [Arb. Units]')
     ax2.legend()
+
+    f.tight_layout()
+    f.subplots_adjust(wspace=0)
+
+    if outName:
+        f.savefig(outName, bbox_inches='tight')
+
+
+def plotJdosW90(fup, fdw, fermi, cell, *, dos_clip=None,
+                outName=None):
+    f, (ax1) = plt.subplots(
+        ncols=1, sharey=True, figsize=(9, 6))
+
+    dos_up = np.loadtxt(fup+'-jdos.dat').T
+    dos_dw = np.loadtxt(fdw+'-jdos.dat').T
+
+    # dos_up[0] -= fermi
+    # dos_dw[0] -= fermi
+
+    ax1.plot(dos_up[0], dos_up[1], '-r', zorder=1, label='Majority Spin (↑)')
+    ax1.plot(dos_dw[0], dos_dw[1], ':b', zorder=2, label='Minority Spin (↓)')
+    ax1.fill_between(dos_up[0], dos_up[1], alpha=0.3, color='r', zorder=1)
+    ax1.fill_between(dos_dw[0], dos_dw[1], alpha=0.3, color='b', zorder=2)
+
+    # Add the BZ critical points
+
+    # ax1.set_ylim(ylim)
+    # ax1.set_xticks(kpoints_x)
+    # ax1.set_xticklabels(kpoints_n)
+    # ax1.grid(axis='x', color='k', linewidth=1, linestyle='-')
+    # ax1.tick_params(axis='x', color='k', width=1)  # length=16,
+    # ax1.margins(x=0)
+    # ax1.tick_params(axis='y', color='k', width=1, direction='out')
+    # ax1.axhline(0, ls='--', c='k', lw=1, zorder=0)  # line at zero
+    ax1.set_xlabel('Energy [eV]')
+    ax1.set_ylim(0, dos_clip)
+    # ax1.axvline(0, ls='--', c='k', lw=1, zorder=0)  # line at zero
+    ax1.set_yticks([])
+    # ax1.set_xlim(0, None)
+    ax1.margins(0, 0)
+    # ax2.set_yticks([])
+    # ax1.tick_params(axis='y', color='k', width=1, length=0,
+    #                 direction='out')  # length=16,
+    ax1.set_ylabel('JDOS [Arb. Units]')
+    ax1.legend()
 
     f.tight_layout()
     f.subplots_adjust(wspace=0)

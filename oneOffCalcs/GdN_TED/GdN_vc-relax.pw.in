@@ -13,14 +13,14 @@
   tstress = .false.
 /
 &SYSTEM
-  degauss =   1.4699723600d-02
-  ecutrho =   769
-  ecutwfc =   118
+  degauss = 1.4699723600d-02
+  ecutrho = 769
+  ecutwfc = 118
   ibrav = 2
   A = 4.999
   nat = 2
   nosym = .false.
-  noncolin = .TRUE.
+  noncolin = .false.
   lspinorb = .true.
   ntyp = 2
   occupations = 'smearing'
