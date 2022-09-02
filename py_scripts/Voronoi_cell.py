@@ -2,6 +2,7 @@
 import sys
 import numpy as np
 import plotly.graph_objects as go
+import plotly
 from scipy.spatial import Voronoi
 import bandplot_kpoints as KPts
 
@@ -39,7 +40,9 @@ def main():
         yaxis=dict(showticklabels=False, showgrid=False, showbackground=True),
         zaxis=dict(showticklabels=False, showgrid=False, showbackground=True),
         ))
-    fig.show()
+    print('Figure plotted; showing figure...')
+    plotly.offline.plot(fig)
+    # fig.show()
 
 
 EXAMPLE_LATTICES = {

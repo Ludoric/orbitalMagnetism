@@ -1,0 +1,7 @@
+&INPUTPP
+ outdir='/nfs/scratch2/trewicedwa/GdN_rel/out_B/',
+ prefix='GdN_rel',
+ filplot='idex',
+ plot_num=???,
+ spin_component=???
+/

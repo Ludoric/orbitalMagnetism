@@ -11,9 +11,9 @@ def main():
         print('\tbandplot_kpoints.py NUM_POINTS CELL [UNITS [ROUTE]]')
         print('\tWhere NUM_POINTS is an integer')
         print('\tCELL is the name of a unit cell')
-        print('\tUNITS is either "crystal" or "kvec"')
         print('\tROUTE is a string of labels of critical points')
         print("\t\t('|' can be used to create a dicontinuity between points)")
+        print('\tUNITS is either "crystal" or "kvec"')
         print("\te.g.: ./bandplot_kpoints.py 100 FCC 'ΓXWKΓLUWLK|UX'\n")
         return
     if sys.argv[1].replace('.', '', 1).isdigit():
@@ -27,12 +27,8 @@ def main():
     if (cell := sys.argv[2].upper()) not in (pC := set(NAME_TO_CRYSTAL_KVEC)):
         print(f'{cell} is not a known cell\n\tTry one of {pC}')
     if len(sys.argv) > 3:
-        units = sys.argv[3]
-    else:
-        units = 'kvec'
-    if len(sys.argv) > 4:
         # clean the list of given critical points (excessivly complicated)
-        route = sys.argv[4].upper().replace('G', 'Γ')
+        route = sys.argv[3].upper().replace('G', 'Γ')
         Pkpts = set(NAME_TO_CRYSTAL_KVEC[cell])
         if len(route) <= 2:
             print('Please supply two or more labels from '
@@ -49,7 +45,11 @@ def main():
     else:
         # take the default route through the cell
         route = getRecommendedRoute(cell)
-
+    if len(sys.argv) > 4:
+        units = sys.argv[4]
+    else:
+        units = 'crystal'
+ 
     print(printKpoints(NPts, cell, units, route).replace('Γ', 'G'))
 
 

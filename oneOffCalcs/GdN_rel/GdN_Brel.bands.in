@@ -1,0 +1,7 @@
+&BANDS
+ outdir='/nfs/scratch2/trewicedwa/GdN_rel/out_B/',
+ prefix='GdN_rel',
+ filband='Brel.bands',
+ lsigma=.true.,
+ plot_2d=.true.
+/
