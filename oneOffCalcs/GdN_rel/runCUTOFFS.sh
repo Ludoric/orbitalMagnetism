@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH --job-name=CUTOFFS
-#SBATCH --time=00-05:00:00
+#SBATCH --time=00-10:00:00
 #SBATCH --output=/nfs/scratch/trewicedwa/GdN_rel/log_cutoffs.out
 #SBATCH --error=/nfs/scratch/trewicedwa/GdN_rel/log_cutoffs.err
-#SBATCH --partition=quicktest
+#SBATCH --partition=parallel
 #SBATCH --ntasks=64
 #SBATCH --cpus-per-task=1
 #SBATCH --tasks-per-node=64
@@ -15,7 +15,7 @@
 TEMPLATE="cutoffs_template.pw.in"
 
 OUTDIR="./out_cutoffs/"
-PSUEDO_DIR="/nfs/home/trewicedwa/orbitalMagnetism/pseudo/"
+PSEUDO_DIR="/nfs/home/trewicedwa/orbitalMagnetism/pseudo/"
 
 A=4.999
 GD4F=8.4
@@ -46,13 +46,13 @@ for ECUTWFC in $(seq 50 10 140) ; do
             PREF="cutoff_${ECUTRHO}_${ECUTWFC}_${K}"
             ST=$(date +%s.%N) ; echo -n $PREF
 
-            sed -e "s+%outdir%+$OUTDIR/g; s/%pseudo_dir%/$PSEUDO_DIR/g;" \
+            sed -e "s+%outdir%+$OUTDIR+g; s+%pseudo_dir%+$PSEUDO_DIR+g;" \
                 -e "s/%prefix%/$PREF/g; s/%ecutwfc%/$ECUTWFC/g;" \
                 -e "s/%ecutrho%/$ECUTRHO/g; s/%A%/$A/g;" \
                 $TEMPLATE > "$PREF.pw.in"
 
             echo -e "K_POINTS automatic\n$K $K $K 0 0 0" >> "$PREF.pw.in"
-            echo -e "HUBBARD ortho-atomic\nU Gd-4f $GD4F\nU Gd-5D $GD5D\n" \
+            echo -e "HUBBARD ortho-atomic\nU Gd-4F $GD4F\nU Gd-5D $GD5D\n" \
                 >> "$PREF.pw.in"
 
             mpirun -np 64 pw.x -npool 4 -in "$PREF.pw.in" > "$PREF.pw.out"
