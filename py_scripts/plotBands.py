@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#! /usr/bin/python3
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
@@ -8,40 +8,75 @@ import re
 # import mpl_sqrtaxis
 
 mpl.rcParams['savefig.format'] = 'pdf'
+mpl.rcParams['lines.linewidth'] = 1
+
+def main():
+    # dat = readBandFile('bands_out_GdN-FCC.bands')
+    # dup = readBandFile('bands2_GdN-FCC-S1.bands')
+    # ddown = readBandFile('bands2_GdN-FCC-S2.bands')
+    # dup = readBandFile('bands-up_GdN-FCC.bands')
+    # ddown = readBandFile('bands-down_GdN-FCC.bands')
+    # plotBands(dup, ddown)
+    # bandD = loadLotsOfData('./', './fermi.tsv', orbital='Gd-4f')
+    # plotKvsHU(bandD, 'FCC', kpoint='Gamma', individual=True, orbital='Gd-4f')
+    # thus if the Gd4f band is 7.8eV below the fermi level, U should be 8.4eV
+    # (from GdN THIN FILMS: BULK AND LOCAL ELECTRONIC...)
+    # plotBandsDos('../tooBig/hubbardOut/H_Gd4f_8.00_GdN-FCC.dos',
+    #              '../tooBig/hubbardOut/H_Gd4f_8.00_GdN-FCC-S1.bands',
+    #              '../tooBig/hubbardOut/H_Gd4f_8.00_GdN-FCC-S2.bands')
+    # bandD = loadLotsOfData('./',
+    #                        './fermi.tsv',
+    #                        orbital='Gd-5d')
+    # plotKvsHU(bandD, kpoint='X', individual=False, orbital='Gd-5d')
+    # plotBandgap(bandD, orbital='Gd-5d')
+
+    # bands = readBandFile('Brel.bands') - 13.9718
+    # proj = readBandFile('Brel.bands.3') 
+    bandD = loadLotsOfData('./', './fermi.tsv', orbital='4f')
+    rap, _ = readBandFile('GdN-HB1-v70_Gd-4f_10.0-5d_6.0_-S2.bands.rap')
+    f, ax = plotKvsHU(bandD, rap, 'ΓXWKΓ', kpoint='X', individual=False, orbital='Gd-4f')
+    f.savefig('GdN_HU1.pdf', bbox_inches='tight')
+    plt.show() # 7.8eV below the fermi level is Gd-4f=5.95eV
+    return
+    rap, _ = readBandFile('GdN_B-S1.bands.rap')
+    dup = readBandFile('GdN_B-S1.bands') - 13.9718
+    ddw = readBandFile('GdN_B-S2.bands') - 13.9718
+    f, ax = plotBands('ΓXWKΓLUWLK|UX', rap, dup, ddw)
+    # f, ax = plotSpinorBands('ΓXWKΓLUWLK|UX', rap, bands, proj, ylim=(-6,6))
+    # ax.set_ylim((-15, 15))
+    f.savefig('GdN_B_Bands.pdf', bbox_inches='tight')
+    plt.show()
+
+    # SmN - Paramagnetic phase 1.3ev from fermi measured from (5d-sup 5d-sdw)
 
 
-def readBandFile(fname, zeroPoint=0):
-    """
-        zeroPoint will usually be the Fermi energy
-    """
-    nbnd = nks = 0
-    dat = []
+
+def readBandFile(fname):
     with open(fname, 'r') as f:
+        nbnd = nks = 0
         line = f.readline().split()
         for i in range(len(line)):
             if 'nbnd' in line[i]:
                 nbnd = int(line[i+1].strip(','))
             elif 'nks' in line[i]:
                 nks = int(line[i+1].strip(','))
+
+        isCritical = []
+        dat = []
         for _ in range(nks):
-            f.readline()  # skip the damm coordinates for now
+            coords = f.readline().split()
+            # skip the damm coordinates for now
+            isCritical.append(coords[-1])
+            # coords has an extra value if the file type is '.rap'
             values = []
             while len(values) < nbnd:
+                # I don't know what these values mean
                 values.extend(f.readline().split())
             dat.append(np.array(values, float))
-    with open(fname+'.rap', 'r') as f:
-        # assume the nbnd and nks are the same as before
-        f.readline()
-        isCritial = []
-        for _ in range(nks):
-            isCritial.append(f.readline().split()[-1])
-            Nvals = 0
-            while Nvals < nbnd:  # I don't know what these values mean
-                Nvals += len(f.readline().split())
-    dat = np.array(dat)
-    dat -= zeroPoint
-    dat = np.concatenate((np.atleast_2d(isCritial) == 'T', dat.T))
-    return dat  # , nks, nbnd
+    if fname[-4:] == '.rap':
+        return np.array(isCritical) == 'T', np.array(dat).T
+    else:
+        return np.array(dat).T
 
 
 def readFermiFile(fname, index_col=0, sep='\t'):
@@ -81,7 +116,7 @@ def loadLotsOfData(bandFName, zeroFN=None, zeroN='FermiE', orbital='Gd4f'):
         else:
             print('Spin not known from file name, defaulting to ↑')
             spin = '↑'
-        fparts = re.split('/|_', fstr)
+        fparts = re.split('/|_|-', fstr)
         HU = float(fparts[fparts.index(orbital)+1])
         # s = fparts[2][4:8]
         # if s[-1] == '-':
@@ -89,9 +124,9 @@ def loadLotsOfData(bandFName, zeroFN=None, zeroN='FermiE', orbital='Gd4f'):
         # HU = float(s)
 
         if zeroFN is None:
-            bandD.setdefault(HU, {})[spin] = readBandFile(file)
+            bandD.setdefault(HU, {})[spin] = readBandFile(str(file))
         else:
-            bandD.setdefault(HU, {})[spin] = readBandFile(file, fD[HU][zeroN])
+            bandD.setdefault(HU, {})[spin] = readBandFile(str(file)) - fD[HU][zeroN]
     return bandD
 
 
@@ -155,7 +190,7 @@ def plotDOS(datdos, ax=None, onY=False):
     return f, ax
 
 
-def plotBands(route, datup, datdw=None, ax=None, nolegend=False):
+def plotBands(route, rap, datup, datdw=None, ax=None, nolegend=False, ylim=(-10, 10)):
     if ax:
         f = None
     else:
@@ -166,14 +201,10 @@ def plotBands(route, datup, datdw=None, ax=None, nolegend=False):
         f.tight_layout()
     horiz = np.linspace(0, 1, datup.shape[1])
     if datdw is not None:
-        if np.array_equal(datup[0], datdw[0]):
-            for i in range(1, datdw.shape[0]):
-                ax.plot(horiz, datdw[i], ':b', zorder=2,
-                        label='Minority Spin (↓)')
-        else:
-            print('Spin up and spin down coordinates do not match.')
-            print('\tSpin down data has been ignored')
-    for i in range(1, datup.shape[0]):
+        for i in range(datdw.shape[0]):
+            ax.plot(horiz, datdw[i], ':b', zorder=2,
+                    label='Minority Spin (↓)')
+    for i in range(datup.shape[0]):
         ax.plot(horiz, datup[i], '-r', zorder=1, label='Majority Spin (↑)')
     # kpoints_x = []
     # kpoints_n = []
@@ -181,10 +212,10 @@ def plotBands(route, datup, datdw=None, ax=None, nolegend=False):
     #     if kpoint := kp.nameFromKvec(l, cell):
     #         kpoints_x.append(h)
     #         kpoints_n.append(kpoint)
-    kpoints_x = horiz[datup[0] == 1]
+    kpoints_x = horiz[rap]
     kpoints_n = [*route.replace('|', '')]
-    drop = np.diff(np.where(datup[0] == 1)[0]) < 2
-    for d in np.where(drop)[0]:
+    drop = np.diff(np.where(rap)).ravel()
+    for d in np.where(drop < 2)[0]:
         kpoints_n[d] += '|' + kpoints_n.pop(d+1)
     kpoints_x = kpoints_x[np.append(drop != True, True)]
     # while '|' in kpoints_n:
@@ -209,39 +240,82 @@ def plotBands(route, datup, datdw=None, ax=None, nolegend=False):
     return f, ax
 
 
-def plotKvsHU(bandD, route, kpoint='G', orbital='Gd4f', individual=False,
-              ax=None):
-    # kindex = [kp.nameFromKvec(r) for r in (bandD.values(), )[0]['↑'][:, :3]
-    #           ].index(kpoint)
-    # for kindex, r in enumerate([:, :3]):
-    #     if kp.nameFromKvec(r, cell) == kpoint:
-    #         break
+def plotSpinorBands(route, rap, dat, proj=None, ax=None, ylim=(-10, 10)):
+    if ax:
+        f = None
+    else:
+        f, (ax) = plt.subplots(ncols=1, figsize=(9, 6))
+        f.tight_layout()
+    horiz = np.linspace(0, 1, dat.shape[1])
 
-    # this is potentially horribly wrong
-    kindex = np.where(tuple(bandD.values())[0]['↑'][0]
-                      )[route.replace('|', '').index(kpoint)]
+    norm = mpl.colors.Normalize(-0.5, 0.5, clip=True)
+    cmap = mpl.colors.LinearSegmentedColormap.from_list('', ['blue','black','red'])
+    for i, (ys, projs) in enumerate(zip(dat, np.zeros_like(dat) if proj is None else proj)):
+        # # https://matplotlib.org/stable/gallery/lines_bars_and_markers/multicolored_line.html
+        # points = np.array([horiz, ys]).T.reshape(-1, 1, 2)
+        # segments = np.concatenate([points[:-1], points[1:]], axis=1)
+        # lc = mpl.collections.LineCollection(segments, cmap=cmap, norm=norm)
+        # lc.set_array(projs[:-1])
+        # lc.set_linewidth(2)
+        # lc.set_joinstyle('round')
+        # line = ax.add_collection(lc)
+        ax.scatter(horiz, ys, s=2, marker='.', c=projs, cmap=cmap, norm=norm, zorder=i, ) 
+    # f.colorbar(line, ax=ax)
+    
+    kpoints_x = horiz[rap]
+    kpoints_n = [*route.replace('|', '')]
+    drop = np.diff(np.where(rap)).ravel()
+    for d in np.where(drop < 2)[0]:
+        kpoints_n[d] += '|' + kpoints_n.pop(d+1)
+    kpoints_x = kpoints_x[np.append(drop != True, True)]
+
+    kpoints_n = kpoints_n[:len(kpoints_x)]
+    kpoints_n += ['?']*(len(kpoints_x) - len(kpoints_n))
+
+    ax.set_xticks(kpoints_x)
+    ax.set_xticklabels(kpoints_n)
+    ax.grid(axis='x', color='k', linewidth=1, linestyle='-')
+    ax.tick_params(axis='x', color='k', width=1)  # length=16,
+    ax.margins(x=0)
+    ax.set_ylim(ylim)
+    ax.tick_params(axis='y', color='k', width=1)
+    ax.axhline(0, c='k', linewidth=1, zorder=0)
+    ax.set_ylabel('Energy [eV]')
+    return f, ax
+
+
+def plotKvsHU(bandD, rap, route, kpoint='Γ', orbital='Gd4f', individual=False,
+              ax=None):
+
+    lbls = np.empty(len(rap), dtype='U3')
+    lbls[rap] = np.array([*route.replace('|', '')])
+    # lbl_idx = np.nonzero(lbls)[0]
+    # for d in np.nonzero(np.diff(lbl_idx) < 2)[0]:
+    #     lbls[d] += '|' + lbls[d+1]
+    #     lbls[d+1] = ''
+    kindex = np.nonzero(lbls == kpoint)[0][0]
+
     Sup, Sdw, Hs = [], [], []
     for HU, S in sorted(bandD.items()):
         if individual:
             plotBands(route, S['↑'], S.get('↓'))
-        Sup.append(S['↑'][1:, kindex])
-        Sdw.append(S['↓'][1:, kindex])
+        Sup.append(S['↑'][:, kindex])
+        Sdw.append(S['↓'][:, kindex])
         Hs.append(HU)
     Sup, Sdw, Hs = np.array(Sup), np.array(Sdw), np.array(Hs)
     # # sort all three arrays by the Hubbard U parameter
     # arginds = Hs.argsort()
     # Sup, Sdw, Hs = Sup[arginds], Sdw[arginds], Hs[arginds]
     # (already sorted by calling sorted(bandD.items()))
-
     if not ax:
-        f = plt.figure(figsize=(9, 6))
+        f = plt.figure(figsize=(4, 6))
         f.tight_layout()
         ax = f.add_subplot()
     ax.plot(Hs, Sup, '-r', zorder=1, label='Majority Spin (↑)')
     ax.plot(Hs, Sdw, ':b', zorder=2, label='Minority Spin (↓)')
     removeDuplicateLabels(ax)
     ax.set_ylim(-10, 10)
-    ax.set_ylabel('Energy [eV]')
+    ax.set_ylabel(f'Energy at {kpoint} [eV]')
     ax.set_xlabel(f'Hubbard U for {orbital} [eV]')
     ax.margins(x=0)
     return f, ax
@@ -270,7 +344,7 @@ def plotBandgap(bandD, orbital='Gd4f', ax=None):
     ax.plot(Hs, Sup, '-r', zorder=1, label='Majority Spin (↑)')
     ax.plot(Hs, Sdw, ':b', zorder=2, label='Minority Spin (↓)')
     # ax.set_ylim(-10, 10)
-    ax.set_ylabel('Energy [eV]')
+    ax.set_ylabel(f'Energy at [eV]')
     ax.set_xlabel(f'Hubbard U for {orbital} [eV]')
     ax.margins(x=0)
     return f, ax
@@ -292,35 +366,5 @@ def plotBandsDos(cell, dosFN, bandSupFN, bandSdwFN):
 
 
 if __name__ == '__main__':
-    # dat = readBandFile('bands_out_GdN-FCC.bands')
-    # dup = readBandFile('bands2_GdN-FCC-S1.bands')
-    # ddown = readBandFile('bands2_GdN-FCC-S2.bands')
-    # dup = readBandFile('bands-up_GdN-FCC.bands')
-    # ddown = readBandFile('bands-down_GdN-FCC.bands')
-    # plotBands(dup, ddown)
-    # bandD = loadLotsOfData('./', './fermi.tsv', orbital='Gd-4f')
-    # plotKvsHU(bandD, 'FCC', kpoint='Gamma', individual=True, orbital='Gd-4f')
-    # thus if the Gd4f band is 7.8eV below the fermi level, U should be 8.4eV
-    # (from GdN THIN FILMS: BULK AND LOCAL ELECTRONIC...)
-    # plotBandsDos('../tooBig/hubbardOut/H_Gd4f_8.00_GdN-FCC.dos',
-    #              '../tooBig/hubbardOut/H_Gd4f_8.00_GdN-FCC-S1.bands',
-    #              '../tooBig/hubbardOut/H_Gd4f_8.00_GdN-FCC-S2.bands')
-    # bandD = loadLotsOfData('./',
-    #                        './fermi.tsv',
-    #                        orbital='Gd-5d')
-    # plotKvsHU(bandD, kpoint='X', individual=False, orbital='Gd-5d')
-    # plotBandgap(bandD, orbital='Gd-5d')
+    main()
 
-    dup = readBandFile('GdN_B-S1.bands', zeroPoint=13.9718)
-    ddw = readBandFile('GdN_B-S2.bands', zeroPoint=13.9718)
-    # dup = readBandFile('SmN_M-S1.bands', zeroPoint=9.5132)
-    # ddown = readBandFile('SmN_M-S2.bands', zeroPoint=9.5132)
-    f, ax = plotBands('ΓXWKΓLUWLK|UX', dup, ddw)
-    # ax.set_ylim((-15, 15))
-    f.savefig('GdN_B_PW_Bands.pdf', bbox_inches='tight')
-    plt.show()
-
-    # SmN - Paramagnetic phase 1.3ev from fermi measured from (5d-sup 5d-sdw)
-
-
-# keep trying to get wannier to work!!!!
