@@ -1,10 +1,10 @@
 &inputpp
-   outdir = '/nfs/scratch2/trewicedwa/GdN_rel/out/'
+   outdir = '/nfs/scratch/trewicedwa/GdN_rel/out/'
    prefix = 'GdN_rel'
    seedname = 'GdN_rel'
    write_mmn = .true.
    write_amn = .true.
    write_uHu = .true.
-   write_spn = .false.
+   write_spn = .true.
    write_unk = .true.
 /

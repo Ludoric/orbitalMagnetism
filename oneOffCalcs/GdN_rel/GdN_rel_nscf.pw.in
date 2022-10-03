@@ -4,7 +4,7 @@
   restart_mode = 'from_scratch'
   etot_conv_thr =   8.0000000000d-05
   forc_conv_thr =   1.0000000000d-04
-  outdir = '/nfs/scratch2/trewicedwa/GdN_rel/out/'
+  outdir = '/nfs/scratch/trewicedwa/GdN_rel/out/'
   prefix = 'GdN_rel'
   pseudo_dir = '/nfs/home/trewicedwa/orbitalMagnetism/pseudo/'
   disk_io = 'low'
@@ -17,7 +17,7 @@
   ecutwfc =   118
   ibrav = 0
   nat = 2
-  nosym = .false.
+  nosym = .true.
   noncolin = .true.
   lspinorb = .true.
   ntyp = 2
@@ -41,13 +41,13 @@ CELL_PARAMETERS (angstrom)
 ATOMIC_SPECIES
 Gd     157.25   Gd.rel-pbesol-spdfn-kjpaw_psl.1.0.0.UPF
 N      14.0067  N.rel-pbesol-n-kjpaw_psl.1.0.0.UPF
+HUBBARD ortho-atomic
+ U Gd-4F 8.4
+ U Gd-5D 6.6
 ATOMIC_POSITIONS (crystal)
 Gd           0.0000000000       0.0000000000       0.0000000000
 N            0.5000000000       0.5000000000       0.5000000000
-HUBBARD ortho-atomic
-U Gd-4F 8.4
-U Gd-5D 6.6
-K_POINTS crystal
+K_POINTS (crystal)
 2744
   0.00000000  0.00000000  0.00000000  3.644315e-04
   0.00000000  0.00000000  0.07142857  3.644315e-04
@@ -2793,3 +2793,4 @@ K_POINTS crystal
   0.92857143  0.92857143  0.78571429  3.644315e-04
   0.92857143  0.92857143  0.85714286  3.644315e-04
   0.92857143  0.92857143  0.92857143  3.644315e-04
+
