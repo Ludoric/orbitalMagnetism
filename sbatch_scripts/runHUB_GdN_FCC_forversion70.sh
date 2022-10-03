@@ -1,18 +1,18 @@
 #!/bin/bash
-#SBATCH --job-name=HU2_v70_GdN
-#SBATCH --time=00-05:00:00
-#SBATCH --output=/nfs/scratch2/trewicedwa/GdN_HU2_v70/logs/GdN_HU2_v70.out
-#SBATCH --error=/nfs/scratch2/trewicedwa/GdN_HU2_v70/logs/GdN_HU2_v70.err
-#SBATCH --partition=quicktest
-#SBATCH --ntasks=128
+#SBATCH --job-name=HU1_v70_GdN
+#SBATCH --time=01-00:00:00
+#SBATCH --output=/nfs/scratch/trewicedwa/GdN_HU1_v70/log.out
+#SBATCH --error=/nfs/scratch/trewicedwa/GdN_HU1_v70/log.err
+#SBATCH --partition=parallel
+#SBATCH --ntasks=144
 #SBATCH --cpus-per-task=1
-#SBATCH --tasks-per-node=64
-#SBATCH --mem-per-cpu=1G
-#SBATCH --nodes=2
+#SBATCH --tasks-per-node=144
+#SBATCH --mem-per-cpu=445M
+#SBATCH --nodes=1
 
 # SRC=$(dirname $(dirname $(realpath ${BASH_SOURCE})))
 SRC="/nfs/home/trewicedwa/orbitalMagnetism"
-SCRATCH="/nfs/scratch2/trewicedwa/GdN_HU2_v70"
+SCRATCH="/nfs/scratch/trewicedwa/GdN_HU1_v70"
 BINLOC="/nfs/home/trewicedwa/qe-7.0/bin"
 
 DO_PW_RELAX=true
@@ -23,7 +23,8 @@ DO_DOS=false
 
 # set this to true, or nothing will happen when you run it for real
 DO_COMPUTE_ANYTHING=true
-
+NPROC=144
+NPOOL=4
 
 PWTEMPLATE="${SRC}/templates/BS2_GdN-FCC_forversion70.pw.in"
 BANDSTEMPLATE="${SRC}/templates/BS_bands.bands.in"
@@ -31,7 +32,7 @@ DOSTEMPLATE="${SRC}/templates/BS.dos.in"
 
 # Prefix should change between cells, the title can change runs of pw.x
 # (the title is only of interest to the operator)
-PREPREFIX='GdN-HB2-v70'
+PREPREFIX='GdN-HB1-v70'
 ECUTRHO=320
 ECUTWFC=80
 
@@ -41,7 +42,6 @@ R_K=14
 NBND=26
 OCCUPATIONS='smearing'
 NOSYM='false'
-HU_GD_4F=8.4
 
 B_CALCULATION='bands'
 B_K_FILE="${SRC}/templates/kpoints.txt"
@@ -65,11 +65,12 @@ if [ "$DO_COMPUTE_ANYTHING" = true ]; then
     module load intel/2021b
 fi
 
-for HU_GD_5D in $(seq 0.2 0.2 8.0); do
+HU_GD_5D=6.0
+for HU_GD_4F in $(seq 3.0 0.2 10.0); do
     # The value for prefix must reflect the values looped through
-    PREFIX="${PREPREFIX}_Gd-5d_${HU_GD_5D}_"
+    PREFIX="${PREPREFIX}_Gd-4f_${HU_GD_4F}-5d_${HU_GD_5D}_"
     TITLE=$PREFIX
-    echo -e "Gd-5d: ${HU_GD_5D}" # NEW CELL
+    echo -e $PREFIX # NEW CELL
 
     if [ "$DO_PW_RELAX" = true ]; then
         START=$(date +%s.%N)
@@ -86,7 +87,7 @@ for HU_GD_5D in $(seq 0.2 0.2 8.0); do
         sed -e "s/%k%/${R_K}/g" $R_K_FILE >> $RPWIOPUT'.in'
 
         if [ "$DO_COMPUTE_ANYTHING" = true ]; then
-            mpirun -np 64 $BINLOC/pw.x -npool 4 -in $RPWIOPUT'.in' > $RPWIOPUT'.out'
+            mpirun -np $NPROC $BINLOC/pw.x -npool $NPOOL -in $RPWIOPUT'.in' > $RPWIOPUT'.out'
         fi
         END=$(date +%s.%N)
         echo "$END $START" | awk "$AWKSTRING"
@@ -107,7 +108,7 @@ for HU_GD_5D in $(seq 0.2 0.2 8.0); do
         cat $B_K_FILE >> $BPWIOPUT'.in'
 
         if [ "$DO_COMPUTE_ANYTHING" = true ]; then
-            mpirun -np 64 $BINLOC/pw.x -npool 4 -in $BPWIOPUT'.in' > $BPWIOPUT'.out'
+            mpirun -np $NPROC $BINLOC/pw.x -npool $NPOOL -in $BPWIOPUT'.in' > $BPWIOPUT'.out'
         fi
         END=$(date +%s.%N)
         echo "$END $START" | awk "$AWKSTRING"
@@ -151,7 +152,7 @@ for HU_GD_5D in $(seq 0.2 0.2 8.0); do
         sed -e "s/%k%/${D_K}/g" $D_K_FILE >> $DPWIOPUT'.in'
 
         if [ "$DO_COMPUTE_ANYTHING" = true ]; then
-            mpirun -np 64 $BINLOC/pw.x -npool 4 -in $DPWIOPUT'.in' > $DPWIOPUT'.out'
+            mpirun -np $NPROC $BINLOC/pw.x -npool $NPOOL -in $DPWIOPUT'.in' > $DPWIOPUT'.out'
         fi
         END=$(date +%s.%N)
         echo "$END $START" | awk "$AWKSTRING"

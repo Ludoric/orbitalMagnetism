@@ -1,0 +1,36 @@
+! in progress notes:
+! pslibrary/rel-pbesol/WORK/Gd.rel-pbesol-spdfn-kjpaw_psl.1.0.0.in.out
+! http://www.mineralscloud.com/resources/repaw/paper.pdf
+! https://www.quantum-espresso.org/Doc/INPUT_LD1.html
+! http://web.mit.edu/espresso_v6.1/amd64_ubuntu1404/qe-6.1/atomic/Doc/pseudo-gen.pdf
+!
+!
+&input
+    title='Gd',
+    zed=64.0,
+    rel=2,
+    config='[Xe] 4f7 5d1 6s2',
+    iswitch=3, ! 3 is pp generation, 2 is pp test, 1 is all electron
+    dft='PBEsol'
+ /
+&inputp
+    lpaw=.true.,
+    pseudotype=3, ! 3=US or PAW mulitple projector (MP), 2=NC MP (not recommended), 1=NC
+    file_pseudopw='Gd.rel-pbesol-spdfn-kjpaw_Etrewick.1.0.UPF',
+    author='ETrewick',
+    lloc=-1,
+    rcloc=0.5, !? Matching radius (a.u.) for local pseudo-potential
+    which_augfun='PSQ',
+    rmatch_augfun_nc=.true.,
+    nlcc=.true., ! nonlinear core correction
+    new_core_ps=.true.,  ! pseudizes the core charge with bessel functions
+    ! rcore=1.3,  !? Matching radius (a.u.) for the smoothing of the core charge
+    ! less than 0.7-0.8 au for 4f electrons
+    tm=.true.  ! RRKJ pseudoistaion (not Troullier-Martins)
+ /
+5
+5S   1   0   2.00  0.00  1.30  1.30   0.0
+6S   2   0   2.00  0.00  1.30  1.30   0.0
+5P   2   1   6.00  0.00  1.40  1.40   0.0
+5D   4   2   1.00  0.00  1.00  1.00   0.0
+4F   4   3   7.00  0.00  1.10  1.10   0.0

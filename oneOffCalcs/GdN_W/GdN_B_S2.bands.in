@@ -1,5 +1,5 @@
 &BANDS
- outdir='/nfs/scratch2/trewicedwa/GdN_W/out/',
+ outdir='/nfs/scratch/trewicedwa/GdN_W/outB/',
  prefix='GdN_B',
  filband='GdN_B-S2.bands',
  spin_component=2,

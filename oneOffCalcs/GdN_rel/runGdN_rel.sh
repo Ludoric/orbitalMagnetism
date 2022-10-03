@@ -1,12 +1,12 @@
 #!/bin/bash
 #SBATCH --job-name=GdN_rel
-#SBATCH --time=00-10:00:00
+#SBATCH --time=10-00:00:00
 #SBATCH --output=/nfs/scratch/trewicedwa/GdN_rel/log_GdN_rel.out
 #SBATCH --error=/nfs/scratch/trewicedwa/GdN_rel/log_GdN_rel.err
 #SBATCH --partition=parallel
-#SBATCH --ntasks=128
-#SBATCH --cpus-per-task=1
-#SBATCH --tasks-per-node=128
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --tasks-per-node=1
 #SBATCH --mem-per-cpu=1G
 #SBATCH --nodes=1
 
@@ -16,8 +16,8 @@ cp /nfs/home/trewicedwa/orbitalMagnetism/oneOffCalcs/GdN_rel/* ./
 # mkdir out
 
 
-thing_one="true"
-thing_two="false"
+thing_one="false"
+thing_two="true"
 thing_three="false"
 
 
@@ -47,33 +47,33 @@ START=$(date +%s.%N)
 
 if [ "$thing_one" = true ]; then
 ST=$(date +%s.%N)
-# # Run pw to obtain the ground state
-# # mpirun -np 64 pw.x -npool 4 -in GdN_vc-relax.pw.in > GdN_vc-relax.pw.out
-# # echo "$(date +%s.%N) $ST GdN_vc-relax.pw" | awk "$AWKSTR" ; ST=$(date +%s.%N)
-# # Run pw to obtain the Bloch states on a uniform k-point grid
-# # !!! use the lattice output from vc-relax as input to scf and wannier90
-# mpirun -np 64 pw.x -npool 4 -in GdN_rel_scf.pw.in > GdN_rel_scf.pw.out
-# echo "$(date +%s.%N) $ST GdN_rel_scf.pw" | awk "$AWKSTR" ; ST=$(date +%s.%N)
-# mkdir out_B
-# cp -R out/* out_B/
-mpirun -np 128 pw.x -npool 8 -in GdN_rel_nscf.pw.in > GdN_rel_nscf.pw.out
+# Run pw to obtain the ground state
+# mpirun -np 64 pw.x -npool 4 -in GdN_vc-relax.pw.in > GdN_vc-relax.pw.out
+# echo "$(date +%s.%N) $ST GdN_vc-relax.pw" | awk "$AWKSTR" ; ST=$(date +%s.%N)
+# Run pw to obtain the Bloch states on a uniform k-point grid
+# !!! use the lattice output from vc-relax as input to scf and wannier90
+mpirun -np 64 pw.x -npool 4 -in GdN_rel_scf.pw.in > GdN_rel_scf.pw.out
+echo "$(date +%s.%N) $ST GdN_rel_scf.pw" | awk "$AWKSTR" ; ST=$(date +%s.%N)
+mkdir out_B
+cp -R out/* out_B/
+mpirun -np 64 pw.x -npool 4 -in GdN_rel_nscf.pw.in > GdN_rel_nscf.pw.out
 echo "$(date +%s.%N) $ST GdN_rel_nscf.pw" | awk "$AWKSTR" ; ST=$(date +%s.%N)
-# 
-# #mpirun -np 64 pw.x -npool 4 -in GdN_Brel_scf.pw.in > GdN_Brel_scf.pw.out
-# #echo "$(date +%s.%N) $ST GdN_Brel_scf.pw" | awk "$AWKSTR" ; ST=$(date +%s.%N)
-# mpirun -np 64 pw.x -npool 4 -in GdN_Brel_bands.pw.in > GdN_Brel_bands.pw.out
-# echo "$(date +%s.%N) $ST GdN_Brel_bands.pw" | awk "$AWKSTR"
+
+#mpirun -np 64 pw.x -npool 4 -in GdN_Brel_scf.pw.in > GdN_Brel_scf.pw.out
+#echo "$(date +%s.%N) $ST GdN_Brel_scf.pw" | awk "$AWKSTR" ; ST=$(date +%s.%N)
+mpirun -np 64 pw.x -npool 4 -in GdN_Brel_bands.pw.in > GdN_Brel_bands.pw.out
+echo "$(date +%s.%N) $ST GdN_Brel_bands.pw" | awk "$AWKSTR"
 fi
 
 
 if [ "$thing_two" = true ]; then
 ST=$(date +%s.%N)
-# !!! run this section on a single CPU - it'll take a while, but at least will finish
-# BANDS CALCULATIONS in qauntum espresso
-bands.x < GdN_Brel.bands.in >  GdN_Brel.bands.out
-echo "$(date +%s.%N) $ST GdN_Brel.bands" | awk "$AWKSTR" ; ST=$(date +%s.%N)
-# Run wannier90 to generate a list of the required overlaps (written into the Fe.nnkp file).
-# !!!! mpi not available for wannier90.x
+# # !!! run this section on a single CPU - it'll take a while, but at least will finish
+# # BANDS CALCULATIONS in qauntum espresso
+# bands.x < GdN_Brel.bands.in >  GdN_Brel.bands.out
+# echo "$(date +%s.%N) $ST GdN_Brel.bands" | awk "$AWKSTR" ; ST=$(date +%s.%N)
+# # Run wannier90 to generate a list of the required overlaps (written into the Fe.nnkp file).
+# # !!!! mpi not available for wannier90.x
 wannier90.x -pp GdN_rel > GdN_rel_1.wannier90.out
 echo "$(date +%s.%N) $ST GdN_rel_1.wannier90" | awk "$AWKSTR" ; ST=$(date +%s.%N)
 # Run pw2wannier90 to compute:

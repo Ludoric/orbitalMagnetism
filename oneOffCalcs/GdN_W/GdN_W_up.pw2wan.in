@@ -1,5 +1,5 @@
 &inputpp
-   outdir = '/nfs/scratch2/trewicedwa/GdN_W/out/'
+   outdir = '/nfs/scratch/trewicedwa/GdN_W/outW/'
    prefix = 'GdN_W'
    seedname = 'GdN_W_up'
    spin_component = 'up'

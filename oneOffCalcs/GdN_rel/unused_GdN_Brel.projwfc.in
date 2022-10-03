@@ -1,8 +1,5 @@
-&BANDS
+&PROJWFC
  outdir='/nfs/scratch/trewicedwa/GdN_rel/out_B/',
  prefix='GdN_rel',
  filband='Brel.bands',
- lsigma(1)=.true.,
- lsigma(2)=.true.,
- lsigma(3)=.true.
 /
